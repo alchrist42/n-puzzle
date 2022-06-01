@@ -12,7 +12,7 @@ def main():
     # lines = sys.stdin.readlines()
     # pzl = [list(map(int, line.split())) for line in lines[2:]]
 
-    pzl = PZL5
+    pzl = PZL5_HARD
 
     # print(pzl)
     # assert(len(solver_manhattan(PZL)) > 1 )
