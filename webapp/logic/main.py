@@ -1,7 +1,7 @@
 from re import I
 import sys
 from solvers import Manhattan, Chebyshev, Euclidean
-from utils import PZL4, PZL5, PZL5_HARD, PZL5_MEDIUM, PZL6
+from utils import PZL3, PZL4, PZL4_MEDIUM, PZL5, PZL5_HARD, PZL5_MEDIUM, PZL6
 
 
 
@@ -12,11 +12,11 @@ def main():
     # lines = sys.stdin.readlines()
     # pzl = [list(map(int, line.split())) for line in lines[2:]]
 
-    pzl = PZL5_HARD
+    pzl = PZL4_MEDIUM
 
     # print(pzl)
     # assert(len(solver_manhattan(PZL)) > 1 )
-    for i in range(6):
+    for i in range(8):
         Manhattan(pzl, optimizator=i).run()
         Chebyshev(pzl, optimizator=i).run()
         Euclidean(pzl, optimizator=i).run()

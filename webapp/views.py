@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .logic.generator import make_puzzle, make_goal
 from .logic.solvers import Chebyshev, Euclidean
+from .logic.checker import check_pazzle
 
 
 def new_pazzle(request, size):
@@ -22,6 +23,7 @@ def new_pazzle(request, size):
         {"pazzle": pzl, "goal": goal},
     )
 
+
 @require_POST
 @csrf_exempt
 def solver(request):
@@ -30,6 +32,10 @@ def solver(request):
     if not pzl:
         return JsonResponse(
             {"error": "no pazzle"},
+        )
+    if not check_pazzle(pzl):
+        return JsonResponse(
+            {"error": "Not any solution for pazzle"},
         )
     # todo add not solvable check
     goal = make_goal(len(pzl), sharp=2)

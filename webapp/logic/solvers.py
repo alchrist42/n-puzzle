@@ -29,7 +29,7 @@ class Solver:
         cnt = 0
         passed = {str_pzl(self.pzl)}
         steps = [(start_dist, cnt, z, self.pzl, [])]
-        k = 1 / max(3, 8 - self.optimizator)
+        k = 1 / max(2, 8 - self.optimizator)
         dsts = set()  # todo для отладки
         for iter_count in range(0, 10**20):
             self.max_steps = max(self.max_steps, len(steps))
@@ -40,7 +40,7 @@ class Solver:
                 self.iteration = iter_count
                 self.spend_time = round(time() - self.start_time, 3)
                 self.print_mertics(cnt)
-                return "tbrl"  # todo replace to correct string
+                return
             poss = [
                 Pos(z.row - 1, z.col),
                 Pos(z.row + 1, z.col),
