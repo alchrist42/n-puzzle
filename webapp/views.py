@@ -6,9 +6,15 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.views import LogoutView
 from django.http import JsonResponse
 
+from .logic.generator import make_puzzle, make_goal
 
-class Index(TemplateView):
-    pass
+
+def new_pazzle(request, size):
+    if size < 3 or size > 6:
+        return JsonResponse({"error": "incorrect puzzle size, must be in [3,6]"},)
+    pzl = make_puzzle(size, solvable=True, sharp=2)
+    goal = make_goal(size, sharp=2)
+    return JsonResponse({"pazzle": pzl, "goal": goal},)
 
 
 # def login_view(request):
