@@ -6,11 +6,12 @@
     <meta charset="UTF-8">
     <title>Пятнашки</title>
     <link rel="stylesheet" href="{% static 'webapp/style.css' %}">
-    <script type="text/javascript" src="{% static 'webapp/index.js' %}"></script>
+    <script type="module"  src="{% static 'webapp/index.js' %}"></script>
+    <script type="module" src="{% static 'webapp/get_new_puzzle.js' %}"></script>
+    <script src="https://js.cx/libs/animate.js"></script>
 </head>
 <body>
     <div class="mainContainer">
-        <a href="{% url 'webapp:new_pazzle' 4 %}"  id="new_pazzle_4" class="btn">new paazle 4</a>
         <button id="btnNew">New combination</button>
         <div id="field"></div>
         <button id="btnSolve">Solve!</button>

@@ -28,16 +28,23 @@ button {
 
 #field {
     display: flex;
-    width: 60vh;
-    height: 60vh;
+    width: 500px;
+    height: 500px;
     background: linear-gradient(15deg, #d0b56e 0%, #ffda7b 100%);
     border: 15px groove #463327;
     flex-wrap: wrap;
     border-radius: 10px;
 }
 
+#buttons {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .item {
     background: #441a02;
+    position: relative;
     box-sizing: border-box;
     border: 4px inset #ffffff;
     border-radius: 10px;
@@ -48,4 +55,3 @@ button {
     font-family: 'Jura', sans-serif;
     text-shadow: 1px 1px 2px #030000, 0 0 1em #818181, 0 0 0.2em #9b9b9b;
 }
-
