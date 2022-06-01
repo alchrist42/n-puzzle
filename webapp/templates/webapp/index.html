@@ -1,0 +1,18 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пятнашки</title>
+    <link rel="stylesheet" href="{% static 'webapp/style.css' %}">
+    <script type="text/javascript" src="{% static 'webapp/index.js' %}"></script>
+</head>
+<body>
+    <div class="mainContainer">
+        <button id="btnNew">New combination</button>
+        <div id="field"></div>
+        <button id="btnSolve">Solve!</button>
+    </div>
+</body>
+</html>
