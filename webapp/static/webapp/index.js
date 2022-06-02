@@ -8,7 +8,7 @@ const state = {
     disableButtons: false,
     solution: []
 }
-let bounceEaseOut = makeEaseOut(quad)
+let bounceEaseOut = makeEaseOut(quad) /***bounce***/
 
 function createItem(width, num) {
     const div = document.createElement('div')
@@ -135,9 +135,28 @@ function swapElement(id, cur, dest) {
         state.disableButtons = state.currentCombination.join('') !== state.solution.join('')
 }
 
+function toggleLoaders() {
+    const loaders = document.getElementsByClassName("lds-ripple")
+    const areVisible = loaders[0].style.display === "inline-block"
+    loaders[0].style.display = areVisible ? 'none' : "inline-block"
+    loaders[1].style.display = areVisible ? 'none' : "inline-block"
+}
+
+function visualizeSolution(solution) {
+    const parsed = JSON.parse(solution)
+    const checks = parsed.checks
+    const koof = parsed.koof
+    const cache_len = parsed.cache_len
+    const queue_len = parsed.queue_len
+    const spend_time = parsed.spend_time
+}
+
 const listenerSolve = async function () {
     if (!state.disableButtons && state.currentCombination.join('') !== state.solution.join('')) {
+        toggleLoaders()
         const solution = await getSolution(state.currentCombination)
+        visualizeSolution(solution)
+        toggleLoaders()
         state.disableButtons = true
         const moves = JSON.parse(solution).moves
         const distance = 500 / state.currentFieldSize
@@ -174,11 +193,11 @@ function epilepticMode() {
     const checkBoxDot = document.getElementById("checkBoxDot")
     if (state.isEpilepticModeEnabled) {
         checkBoxDot.style.left = '0px'
-        checkBoxDot.style.right = '29px'
+        checkBoxDot.style.right = '28px'
         checkBoxDot.style.backgroundColor = '#441a02'
     } else {
         checkBoxDot.style.right = '0px'
-        checkBoxDot.style.left = '29px'
+        checkBoxDot.style.left = '28px'
         checkBoxDot.style.backgroundColor = '#441a02'
     }
     state.isEpilepticModeEnabled = (!state.isEpilepticModeEnabled)
