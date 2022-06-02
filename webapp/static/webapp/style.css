@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Jura:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
 
 * {
     padding: 0;
@@ -12,7 +12,7 @@ button {
     height: 40px;
     background: #742f06;
     color: white;
-    font-family: 'Jura', sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 13px;
     border-radius: 5px;
     margin: 15px;
@@ -60,6 +60,25 @@ button {
     padding: 10px;
 }
 
+#checkBox {
+    width: 50px;
+    height: 20px;
+    border: #1b1b1b solid 2px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+
+#checkBoxDot {
+    width: 16px;
+    height: 16px;
+    border-radius: 100px;
+    background: #441a02;
+    margin: 1px;
+    border: #441a02 solid 2px;
+    position: relative;
+}
+
 .horizontalContainer {
     height: 70px;
     display: flex;
@@ -70,13 +89,13 @@ button {
     background: #441a02;
     position: relative;
     box-sizing: border-box;
-    border: 4px inset #ffffff;
+    border: 4px inset #a68e50;
     border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-family: 'Jura', sans-serif;
+    color: #e6c675;
+    font-family: 'Open Sans', sans-serif;
     text-shadow: 1px 1px 2px #030000, 0 0 1em #818181, 0 0 0.2em #9b9b9b;
 }
 

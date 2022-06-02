@@ -40,7 +40,11 @@ def solver(request):
         )
     # todo add not solvable check
     goal = make_goal(len(pzl), sharp=2)
-    sol = Chebyshev(pzl, optimizator=2)
+    if len(pzl) == 5:
+        opt = 2
+    else:
+        opt = 4
+    sol = Chebyshev(pzl, optimizator=opt)
     sol.run()
     moves = sol.moves
     return JsonResponse(

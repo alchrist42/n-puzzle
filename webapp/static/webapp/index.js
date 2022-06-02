@@ -3,33 +3,41 @@ const state = {
     currentFieldSize: 3,
     animationSpeed: 200,
     currentTimers: [],
-    currentRenderTimers: []
+    currentRenderTimers: [],
+    isEpilepticModeEnabled: false,
+    disableButtons: false,
+    solution: []
 }
-let bounceEaseOut = makeEaseOut(bounce)
+let bounceEaseOut = makeEaseOut(quad)
 
 function createItem(width, num) {
     const div = document.createElement('div')
     if (num !== 0) {
         div.className = 'item'
         div.innerHTML += num
+        if (state.isEpilepticModeEnabled) {
+            div.style.backgroundColor = `#${Math.floor(Math.random()*1670)}`
+            document.getElementById("checkBoxDot").style.backgroundColor = `#${Math.floor(Math.random()*1675)}`
+        }
+
     }
     div.style.width = `${width}%`
     div.style.height = `${width}%`
-    div.style.fontSize = `${width * 1.4}px`
+    div.style.fontSize = `${width * 2.5}px`
     div.id = num
     return div
 }
 
-function renderField(combination) {
+function renderField() {
     const field = document.getElementById('field')
     let child = field.lastElementChild
     while (child) {
         field.removeChild(child)
         child = field.lastElementChild
     }
-    const itemSize = 100 / combination[0].length
+    const itemSize = 100 / state.currentCombination[0].length
     const arr = []
-    combination.map(item => item.map(it => arr.push(it)))
+    state.currentCombination.map(item => item.map(it => arr.push(it)))
     for (let it of arr) {
         const item = createItem(itemSize, it)
         field.appendChild(item)
@@ -38,14 +46,17 @@ function renderField(combination) {
 }
 
 function refreshField () {
-    for (let timer of state.currentTimers)
-        clearInterval(timer)
-    for (let timer of state.currentRenderTimers)
-        clearInterval(timer)
-    getNewPuzzle(state.currentFieldSize).then(r => {
-        state.currentCombination = JSON.parse(r).pazzle
-        renderField(state.currentCombination)
-    })
+    if (!state.disableButtons) {
+        for (let timer of state.currentTimers)
+            clearInterval(timer)
+        for (let timer of state.currentRenderTimers)
+            clearInterval(timer)
+        getNewPuzzle(state.currentFieldSize).then(r => {
+            state.currentCombination = JSON.parse(r).pazzle
+            state.solution = JSON.parse(r).goal
+            renderField(state.currentCombination)
+        })
+    }
 }
 
 function makeEaseOut(timing) {
@@ -60,6 +71,10 @@ function bounce(timeFraction) {
             return -Math.pow((11 - 6 * a - 11 * timeFraction) / 4, 2) + Math.pow(b, 2)
         }
     }
+}
+
+function quad(timeFraction) {
+    return Math.pow(timeFraction, 2)
 }
 
 const move = function (id, dist, dir, current, destination, i) {
@@ -85,6 +100,7 @@ const move = function (id, dist, dir, current, destination, i) {
 }
 
 const getSolution = async (currentCombination) => {
+    state.disableButtons = true
     const myHeaders = new Headers()
     myHeaders.append('Content-Type', 'application/json')
     myHeaders.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000')
@@ -115,27 +131,33 @@ function swapElement(id, cur, dest) {
     state.currentCombination[dest[0]][dest[1]] = id
     state.currentCombination[cur[0]][cur[1]] = 0
     renderField(state.currentCombination)
+    if (state.disableButtons)
+        state.disableButtons = state.currentCombination.join('') !== state.solution.join('')
 }
 
 const listenerSolve = async function () {
-    const solution = await getSolution(state.currentCombination)
-    const moves = JSON.parse(solution).moves
-    const distance = 500 / state.currentFieldSize
-    for (let i = 0; i < moves.length; i++) {
-        const id = moves[i][0]
-        const current = moves[i][1]
-        const destination = moves[i][2]
-        const direction = getDirection(current, destination)
-        state.currentTimers[i] = setTimeout(() => {
-            move(id, distance, direction, current, destination, i)
-        }, i * state.animationSpeed)
-
+    if (!state.disableButtons && state.currentCombination.join('') !== state.solution.join('')) {
+        const solution = await getSolution(state.currentCombination)
+        state.disableButtons = true
+        const moves = JSON.parse(solution).moves
+        const distance = 500 / state.currentFieldSize
+        for (let i = 0; i < moves.length; i++) {
+            const id = moves[i][0]
+            const current = moves[i][1]
+            const destination = moves[i][2]
+            const direction = getDirection(current, destination)
+            state.currentTimers[i] = setTimeout(() => {
+                move(id, distance, direction, current, destination, i)
+            }, i * state.animationSpeed)
+        }
     }
 }
 
 const listenerSize = function (size) {
-    state.currentFieldSize = size
-    refreshField()
+    if (!state.disableButtons) {
+        state.currentFieldSize = size
+        refreshField()
+    }
 }
 
 const getNewPuzzle = async (size) => {
@@ -147,35 +169,30 @@ const getNewPuzzle = async (size) => {
     return res.text()
 }
 
-function toggleList() {
-    const click = document.getElementById('listItems');
-    const isHidden = click.style.display ==='none'
-        click.style.display = isHidden ? 'block' : 'none'
-    if (!isHidden) {
-        document.getElementById('slow').addEventListener('click', function () {
-            console.log('slow click')
-            state.animationSpeed = 1000
-        })
-        document.getElementById('medium').addEventListener('click', function () {
-            console.log('medium click')
-            state.animationSpeed = 500
-        })
-        document.getElementById('fast').addEventListener('click', function () {
-            console.log('fast click')
-            state.animationSpeed = 100
-        })
-    }
 
+function epilepticMode() {
+    const checkBoxDot = document.getElementById("checkBoxDot")
+    if (state.isEpilepticModeEnabled) {
+        checkBoxDot.style.left = '0px'
+        checkBoxDot.style.right = '29px'
+        checkBoxDot.style.backgroundColor = '#441a02'
+    } else {
+        checkBoxDot.style.right = '0px'
+        checkBoxDot.style.left = '29px'
+        checkBoxDot.style.backgroundColor = '#441a02'
+    }
+    state.isEpilepticModeEnabled = (!state.isEpilepticModeEnabled)
+    renderField()
 }
 
 window.onload = function () {
     const buttonNewCombination = document.getElementById('btnNew')
     const buttonSolve = document.getElementById('btnSolve')
-    const buttonSpeed = document.getElementById('speedList')
+    const checkBox = document.getElementById("checkBox")
 
     buttonSolve.addEventListener('click', listenerSolve)
     buttonNewCombination.addEventListener('click', refreshField)
-    buttonSpeed.addEventListener('click', toggleList)
+    checkBox.addEventListener('click', epilepticMode)
     for (let i = 3; i < 6; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
         document.getElementById(`${i}x${i}`).addEventListener('click', () => {listenerSize(i)})
     refreshField()
