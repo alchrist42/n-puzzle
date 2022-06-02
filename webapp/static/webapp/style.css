@@ -36,7 +36,31 @@ button {
     border-radius: 10px;
 }
 
-#buttons {
+#listItems {
+    display: none;
+    width: 130px;
+    height: 120px;
+    position: relative;
+    left: 5px;
+}
+
+#speedList {
+    margin: 25px 0 0;
+}
+
+#listItems a {
+    display: block;
+    font-size: 18px;
+    width: 100px;
+    height: 20px;
+    background-color: #441a02;
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.horizontalContainer {
     height: 70px;
     display: flex;
     align-items: center;
@@ -54,4 +78,9 @@ button {
     color: white;
     font-family: 'Jura', sans-serif;
     text-shadow: 1px 1px 2px #030000, 0 0 1em #818181, 0 0 0.2em #9b9b9b;
+}
+
+.dropdown {
+    width: 130px;
+    height: 90px;
 }

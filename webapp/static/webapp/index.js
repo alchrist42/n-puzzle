@@ -1,68 +1,16 @@
-const combination1 = [
-    [1, 2, 3],
-    [8, 0, 4],
-    [7, 6, 5],
-]
-const combination2 = [
-    [1, 2, 3, 4],
-    [12, 13, 14, 5],
-    [11, 0, 15, 6],
-    [10, 9, 8, 7],
-]
-const combination21 = [
-    [1, 2, 3, 4],
-    [12, 0, 14, 5],
-    [11, 13, 15, 6],
-    [10, 9, 8, 7],
-]
-const combination22 = [
-    [1, 2, 3, 4],
-    [12, 14, 0, 5],
-    [11, 13, 15, 6],
-    [10, 9, 8, 7],
-]
-const combination23 = [
-    [1, 2, 0, 4],
-    [12, 14, 3, 5],
-    [11, 13, 15, 6],
-    [10, 9, 8, 7],
-]
-const combination3 = [
-    [1, 2, 3, 4, 5, 6],
-    [20, 33, 34, 35, 24 ,7],
-    [19, 32, 0, 36, 25, 8],
-    [18, 31, 38, 37, 26, 9],
-    [17, 30, 29, 28, 27, 10],
-    [16, 15, 14, 13, 12, 11],
-]
-const combination31 = [
-    [1, 2, 3, 4, 5, 6],
-    [20, 33, 34, 35, 24 ,7],
-    [19, 0, 32, 36, 25, 8],
-    [18, 31, 38, 37, 26, 9],
-    [17, 30, 29, 28, 27, 10],
-    [16, 15, 14, 13, 12, 11],
-]
-const combination32 = [
-    [1, 2, 3, 4, 5, 6],
-    [20, 33, 34, 35, 24 ,7],
-    [0, 19, 32, 36, 25, 8],
-    [18, 31, 38, 37, 26, 9],
-    [17, 30, 29, 28, 27, 10],
-    [16, 15, 14, 13, 12, 11],
-]
-const combination33 = [
-    [1, 2, 3, 4, 5, 6],
-    [0, 33, 34, 35, 24 ,7],
-    [20, 19, 32, 36, 25, 8],
-    [18, 31, 38, 37, 26, 9],
-    [17, 30, 29, 28, 27, 10],
-    [16, 15, 14, 13, 12, 11],
-]
-function createItem (width, num) {
-    const div = document.createElement("div")
+const state = {
+    currentCombination: [],
+    currentFieldSize: 3,
+    animationSpeed: 200,
+    currentTimers: [],
+    currentRenderTimers: []
+}
+let bounceEaseOut = makeEaseOut(bounce)
+
+function createItem(width, num) {
+    const div = document.createElement('div')
     if (num !== 0) {
-        div.className = "item"
+        div.className = 'item'
         div.innerHTML += num
     }
     div.style.width = `${width}%`
@@ -72,19 +20,12 @@ function createItem (width, num) {
     return div
 }
 
-function createBtn (title) {
-    const btn = document.createElement("button")
-    btn.innerHTML += title
-    btn.id = title
-    return btn
-}
-
-function renderField (combination) {
-    const field = document.getElementById("field")
-    let child = field.lastElementChild;
+function renderField(combination) {
+    const field = document.getElementById('field')
+    let child = field.lastElementChild
     while (child) {
-        field.removeChild(child);
-        child = field.lastElementChild;
+        field.removeChild(child)
+        child = field.lastElementChild
     }
     const itemSize = 100 / combination[0].length
     const arr = []
@@ -96,10 +37,20 @@ function renderField (combination) {
     return field
 }
 
+function refreshField () {
+    for (let timer of state.currentTimers)
+        clearInterval(timer)
+    for (let timer of state.currentRenderTimers)
+        clearInterval(timer)
+    getNewPuzzle(state.currentFieldSize).then(r => {
+        state.currentCombination = JSON.parse(r).pazzle
+        renderField(state.currentCombination)
+    })
+}
 
 function makeEaseOut(timing) {
-    return function(timeFraction) {
-        return 1 - timing(1 - timeFraction);
+    return function (timeFraction) {
+        return 1 - timing(1 - timeFraction)
     }
 }
 
@@ -111,69 +62,122 @@ function bounce(timeFraction) {
     }
 }
 
-let bounceEaseOut = makeEaseOut(bounce);
-
-const listenerSolve2 = function () {
+const move = function (id, dist, dir, current, destination, i) {
     animate({
-        duration: 300,
+        duration: state.animationSpeed,
         timing: bounceEaseOut,
-        draw: function(progress) {
-            const elem = document.getElementById('9')
-            elem.style.bottom = progress * 124 + 'px';
+        draw: function (progress) {
+            const elem = document.getElementById(id)
+            if (elem && dir === 'left')
+                elem.style.left = progress * dist + 'px'
+            if (elem && dir === 'right')
+                elem.style.right = progress * dist + 'px'
+            if (elem && dir === 'top')
+                elem.style.top = progress * dist + 'px'
+            if (elem && dir === 'bottom')
+                elem.style.bottom = progress * dist + 'px'
+            if (progress === 1)
+                state.currentRenderTimers[i] = setTimeout(() => {
+                    swapElement(id, current, destination)
+                })
         }
-    });
+    })
 }
-const listenerSolve3 = function () {
-    animate({
-        duration: 300,
-        timing: bounceEaseOut,
-        draw: function(progress) {
-            const elem = document.getElementById('32')
-            elem.style.left = progress * 83 + 'px';
-        }
-    });
+
+const getSolution = async (currentCombination) => {
+    const myHeaders = new Headers()
+    myHeaders.append('Content-Type', 'application/json')
+    myHeaders.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000')
+    const raw = JSON.stringify({'pazzle': currentCombination})
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+    const res = await fetch('http://127.0.0.1:8000/solver/', requestOptions)
+    return res.text()
+}
+
+function getDirection(current, destination) {
+    if (current[0] - destination[0] > 0)
+        return 'bottom'
+    if (current[0] - destination[0] < 0)
+        return 'top'
+    if (current[1] - destination[1] > 0)
+        return 'right'
+    if (current[1] - destination[1] < 0)
+        return 'left'
+    return null
+}
+
+function swapElement(id, cur, dest) {
+    state.currentCombination[dest[0]][dest[1]] = id
+    state.currentCombination[cur[0]][cur[1]] = 0
+    renderField(state.currentCombination)
+}
+
+const listenerSolve = async function () {
+    const solution = await getSolution(state.currentCombination)
+    const moves = JSON.parse(solution).moves
+    const distance = 500 / state.currentFieldSize
+    for (let i = 0; i < moves.length; i++) {
+        const id = moves[i][0]
+        const current = moves[i][1]
+        const destination = moves[i][2]
+        const direction = getDirection(current, destination)
+        state.currentTimers[i] = setTimeout(() => {
+            move(id, distance, direction, current, destination, i)
+        }, i * state.animationSpeed)
+
+    }
+}
+
+const listenerSize = function (size) {
+    state.currentFieldSize = size
+    refreshField()
 }
 
 const getNewPuzzle = async (size) => {
     const requestOptions = {
         method: 'GET',
         redirect: 'follow'
-    };
+    }
     const res = await fetch(`http://127.0.0.1:8000/new_pazzle/${size}`, requestOptions)
     return res.text()
 }
 
-const createButtons = () => {
-    const container = document.getElementById("buttons")
-    const buttons = ['3x3', '4x4', '5x5', '6x6']
-    for (let it of buttons) {
-        const button = createBtn(it)
-        container.appendChild(button)
+function toggleList() {
+    const click = document.getElementById('listItems');
+    const isHidden = click.style.display ==='none'
+        click.style.display = isHidden ? 'block' : 'none'
+    if (!isHidden) {
+        document.getElementById('slow').addEventListener('click', function () {
+            console.log('slow click')
+            state.animationSpeed = 1000
+        })
+        document.getElementById('medium').addEventListener('click', function () {
+            console.log('medium click')
+            state.animationSpeed = 500
+        })
+        document.getElementById('fast').addEventListener('click', function () {
+            console.log('fast click')
+            state.animationSpeed = 100
+        })
     }
+
 }
 
+window.onload = function () {
+    const buttonNewCombination = document.getElementById('btnNew')
+    const buttonSolve = document.getElementById('btnSolve')
+    const buttonSpeed = document.getElementById('speedList')
 
-window.onload = function() {
-    let currentCombination = combination2
-    let currentFieldSize = 4
-    getNewPuzzle(currentFieldSize).then(r => {
-        // console.log(r)
-        createButtons()
-        currentCombination = JSON.parse(r).pazzle
-        renderField(currentCombination)
-        const buttonNewCombination = document.getElementById("btnNew")
-        const buttonSolve = document.getElementById("btnSolve")
-        buttonSolve.addEventListener('click', listenerSolve3)
-        buttonNewCombination.addEventListener('click', function () {
-            const isThree = currentCombination === combination3
-            buttonSolve.removeEventListener('click', isThree ? listenerSolve3 : listenerSolve2)
-            renderField(isThree ? combination2 : combination3)
-            buttonSolve.addEventListener('click', isThree ? listenerSolve2 : listenerSolve3)
-            currentCombination = isThree ? combination2 : combination3
-        })
-    })
-
-
-
+    buttonSolve.addEventListener('click', listenerSolve)
+    buttonNewCombination.addEventListener('click', refreshField)
+    buttonSpeed.addEventListener('click', toggleList)
+    for (let i = 3; i < 6; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
+        document.getElementById(`${i}x${i}`).addEventListener('click', () => {listenerSize(i)})
+    refreshField()
 }
 
