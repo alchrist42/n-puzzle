@@ -1,8 +1,8 @@
 from time import time
-from copy import deepcopy
+from copy import deepcopy, copy
 from bisect import insort_left
 
-from utils import Pos, make_goal_map, get_zero_pos, conver_to_dct, str_pzl
+from .utils import Pos, make_goal_map, get_zero_pos, conver_to_dct, str_pzl
 
 
 class Solver:
@@ -11,6 +11,9 @@ class Solver:
         self.pzl = pzl
         self.s = len(pzl)
         self.optimizator=optimizator
+        self.max_steps = 0
+        self.len_cache = 0
+        self.iteration = 0
         self.start_time = time()
 
     def evristic(a: Pos, b: Pos):
@@ -23,19 +26,21 @@ class Solver:
         dpzl = conver_to_dct(self.pzl)
 
         start_dist = sum(self.evristic(dpzl[x], dhlp[x]) for x in dpzl)
-        cnt = max_steps = 0
+        cnt = 0
         passed = {str_pzl(self.pzl)}
-        steps = [(start_dist, cnt, z, self.pzl)]
-        k = min(self.optimizator, self.s) / self.s
+        steps = [(start_dist, cnt, z, self.pzl, [])]
+        k = 1 / max(2, 8 - self.optimizator)
         dsts = set()  # todo для отладки
         for iter_count in range(0, 10**20):
-            max_steps = max(max_steps, len(steps))
-            dist, cnt, z, pzl = steps.pop()
+            self.max_steps = max(self.max_steps, len(steps))
+            dist, cnt, z, pzl, moves = steps.pop()
             if abs(dist) < 0.0001:
-                self.print_mertics(
-                    cnt, iter_count, len(passed), max_steps, time() - self.start_time
-                )
-                return "tbrl"  # todo replace to correct string
+                self.moves = moves
+                self.len_cache = len(passed)
+                self.iteration = iter_count
+                self.spend_time = round(time() - self.start_time, 3)
+                self.print_mertics(cnt)
+                return
             poss = [
                 Pos(z.row - 1, z.col),
                 Pos(z.row + 1, z.col),
@@ -62,17 +67,19 @@ class Solver:
                 # Если такой вариант пазла еще не добавляли в возможные ходы
                 if str_pzl(new_pzl) not in passed:
                     passed.add(str_pzl(new_pzl))
+                    new_moves = copy(moves)
+                    new_moves.append((val, pos, z))
                     # Ход вставляется в отсортированный список. где в конце - ходы с наименьшей дистанцией до цели и наименьшим кол-вом движений от начала игры
                     if self.optimizator:
                         insort_left(
                             steps,
-                            (new_dist, cnt + 1, pos, new_pzl),
+                            (new_dist, cnt + 1, pos, new_pzl, new_moves),
                             key=lambda x: -(x[0] + x[1] * k),
                         )
                     else:
                         insort_left(
                             steps,
-                            (new_dist, cnt + 1, pos, new_pzl),
+                            (new_dist, cnt + 1, pos, new_pzl, new_moves),
                             key=lambda x: -x[0],
                         )
 
@@ -86,15 +93,15 @@ class Solver:
             #     dsts.add(dist)
             #     print("dist to solved: ", dist)
 
-    def print_mertics(self, cnt, checks, len_cache, len_queue, spend_time):
+    def print_mertics(self, cnt):
         print("\n\tSolved!")
         print("Evristic name".ljust(20), self.name)
         print("Optimizator koof".ljust(20), self.optimizator)
         print("Moves".ljust(20), cnt)
-        print("Checks".ljust(20), checks)
-        print("Cache lenght".ljust(20), len_cache)
-        print("Max lenght queue".ljust(20), len_queue)
-        print("Spended time".ljust(20), round(spend_time, 3))
+        print("Checks".ljust(20), self.iteration)
+        print("Cache lenght".ljust(20), self.len_cache)
+        print("Max lenght queue".ljust(20), self.max_steps)
+        print("Spended time".ljust(20), self.spend_time)
 
     @classmethod
     def print_pzl(pzl):

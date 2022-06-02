@@ -6,15 +6,55 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.views import LogoutView
 from django.http import JsonResponse
 
+from django.views.decorators.http import require_POST
 from .logic.generator import make_puzzle, make_goal
+from .logic.solvers import Chebyshev, Euclidean
+from .logic.checker import check_pazzle
 
 
 def new_pazzle(request, size):
     if size < 3 or size > 6:
-        return JsonResponse({"error": "incorrect puzzle size, must be in [3,6]"},)
+        return JsonResponse(
+            {"error": "incorrect puzzle size, must be in [3,6]"},
+        )
     pzl = make_puzzle(size, solvable=True, sharp=2)
     goal = make_goal(size, sharp=2)
-    return JsonResponse({"pazzle": pzl, "goal": goal},)
+    return JsonResponse(
+        {"pazzle": pzl, "goal": goal},
+        json_dumps_params={"indent":2}
+    )
+
+
+@require_POST
+@csrf_exempt
+def solver(request):
+    body = json.loads(request.body)
+    pzl = body.get("pazzle")
+    if not pzl:
+        return JsonResponse(
+            {"error": "no pazzle"},
+        )
+    if not check_pazzle(pzl):
+        return JsonResponse(
+            {"error": "Not any solution for pazzle"},
+        )
+    # todo add not solvable check
+    goal = make_goal(len(pzl), sharp=2)
+    sol = Chebyshev(pzl, optimizator=2)
+    sol.run()
+    moves = sol.moves
+    return JsonResponse(
+        {
+            "evristic_name": sol.name,
+            "moves": sol.moves,
+            "checks": sol.iteration,
+            "koof": sol.optimizator,
+            "cache_len": sol.len_cache,
+            "queue_len": sol.max_steps,
+            "spend_time": sol.spend_time,
+        },
+        json_dumps_params={"indent":2}
+    )
 
 
 # def login_view(request):
@@ -49,7 +89,6 @@ def new_pazzle(request, size):
 #     return render(request, "account/login.html", {"form": form})
 
 
-
 # class Logout(LogoutView):
 #     next_page = 'account:account'
 
@@ -77,4 +116,3 @@ def new_pazzle(request, size):
 #                 return JsonResponse({"logged": False, "msg": "wrong user/pass"}, )
 #         else:
 #             return JsonResponse({"logged": False, "msg": "wrong user/pass"},)
-

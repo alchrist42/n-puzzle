@@ -59,4 +59,5 @@ def make_goal(s, sharp=1):
 	return puzzle
 
 if __name__ == "__main__":
-	puzzle = make_puzzle(random.randint(3,6), solvable=True)
+	puzzle = make_puzzle(random.randint(3,6), solvable=True, sharp=2)
+	print(puzzle)
