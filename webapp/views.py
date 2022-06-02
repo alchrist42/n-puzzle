@@ -21,6 +21,7 @@ def new_pazzle(request, size):
     goal = make_goal(size, sharp=2)
     return JsonResponse(
         {"pazzle": pzl, "goal": goal},
+        json_dumps_params={"indent":2}
     )
 
 
@@ -51,7 +52,8 @@ def solver(request):
             "cache_len": sol.len_cache,
             "queue_len": sol.max_steps,
             "spend_time": sol.spend_time,
-        }
+        },
+        json_dumps_params={"indent":2}
     )
 
 
