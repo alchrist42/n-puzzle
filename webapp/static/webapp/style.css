@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;500&display=swap');
 * {
     padding: 0;
     margin: 0;
@@ -13,14 +12,34 @@ button {
     background: #742f06;
     color: white;
     font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
     font-size: 13px;
     border-radius: 5px;
     margin: 15px;
     padding: 7px;
 }
 
+p {
+    width: 200px;
+    height: 20px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+#btnSolve {
+    margin-top: 50px
+}
+
+#speed2 {
+    background-color: #3a0000;
+}
+
 .mainContainer {
     display: flex;
+    height: 100vh;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -83,7 +102,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 600px;
+    height: 550px;
 }
 
 .horizontalContainer {
@@ -91,6 +110,13 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.verticalContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
 }
 
 .item {
@@ -104,12 +130,8 @@ button {
     align-items: center;
     color: #e6c675;
     font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
     text-shadow: 1px 1px 2px #030000, 0 0 1em #818181, 0 0 0.2em #9b9b9b;
-}
-
-.dropdown {
-    width: 130px;
-    height: 90px;
 }
 
 #leftSide, #rightSide {
@@ -117,6 +139,13 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+}
+
+#rightSide p {
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 50px;
 }
 
 /**LOADER**/
@@ -124,7 +153,7 @@ button {
     position: relative;
     width: 80px;
     height: 80px;
-    display: none;
+    /*display: none;*/
 }
 .lds-ripple div {
     position: absolute;

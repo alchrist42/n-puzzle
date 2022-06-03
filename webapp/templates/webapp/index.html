@@ -6,37 +6,35 @@
     <meta charset="UTF-8">
     <title>Пятнашки</title>
     <link rel="stylesheet" href="{% static 'webapp/style.css' %}">
+    <link rel="icon" href="{% static 'webapp/assets/icon.png' %}">
     <script type="module" src="{% static 'webapp/index.js' %}"></script>
     <script type="module" src="{% static 'webapp/get_new_puzzle.js' %}"></script>
     <script src="https://js.cx/libs/animate.js"></script>
 </head>
 <body>
 <div class="mainContainer">
-    <button id="btnNew">New combination</button>
     <div id="buttons" class="horizontalContainer">
         <button id="3x3">3x3</button>
         <button id="4x4">4x4</button>
         <button id="5x5">5x5</button>
-        <!--        <button id="6x6">6x6</button>-->
+        <!--                <button id="6x6">6x6</button>-->
     </div>
     <div id="largeContainer">
         <div id="leftSide">
-            <div class="lds-ripple">
-                <div></div>
-                <div></div>
+            <div id="speed" class="verticalContainer">
+                <p>Speed:</p>
+                <button id="speed1">Slow</button>
+                <button id="speed2">Normal</button>
+                <button id="speed3">Fast</button>
+                <button id="btnSolve">Solve!</button>
+                <button id="btnStop">Stop</button>
+                <div id="checkBox">
+                    <div id="checkBoxDot"></div>
+                </div>
             </div>
         </div>
         <div id="field"></div>
-        <div id="rightSide">
-            <div class="lds-ripple">
-                <div></div>
-                <div></div>
-            </div>
-        </div>
-    </div>
-    <button id="btnSolve">Solve!</button>
-    <div id="checkBox">
-        <div id="checkBoxDot"></div>
+        <div id="rightSide"></div>
     </div>
 </div>
 </body>

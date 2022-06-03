@@ -1,6 +1,6 @@
 const state = {
     currentCombination: [],
-    currentFieldSize: 3,
+    currentFieldSize: 4,
     animationSpeed: 200,
     currentTimers: [],
     currentRenderTimers: [],
@@ -17,9 +17,8 @@ function createItem(width, num) {
         div.innerHTML += num
         if (state.isEpilepticModeEnabled) {
             div.style.backgroundColor = `#${Math.floor(Math.random()*1670)}`
-            document.getElementById("checkBoxDot").style.backgroundColor = `#${Math.floor(Math.random()*1675)}`
+            document.getElementById('checkBoxDot').style.backgroundColor = `#${Math.floor(Math.random()*1675)}`
         }
-
     }
     div.style.width = `${width}%`
     div.style.height = `${width}%`
@@ -28,13 +27,17 @@ function createItem(width, num) {
     return div
 }
 
+function clearChildElements(element) {
+    let child = element.lastElementChild
+    while (child) {
+        element.removeChild(child)
+        child = element.lastElementChild
+    }
+}
+
 function renderField() {
     const field = document.getElementById('field')
-    let child = field.lastElementChild
-    while (child) {
-        field.removeChild(child)
-        child = field.lastElementChild
-    }
+    clearChildElements(field)
     const itemSize = 100 / state.currentCombination[0].length
     const arr = []
     state.currentCombination.map(item => item.map(it => arr.push(it)))
@@ -133,30 +136,46 @@ function swapElement(id, cur, dest) {
     renderField(state.currentCombination)
     if (state.disableButtons)
         state.disableButtons = state.currentCombination.join('') !== state.solution.join('')
+    state.currentCombination.join('') === state.solution.join('') ? state.solution = [] : 0
 }
 
-function toggleLoaders() {
-    const loaders = document.getElementsByClassName("lds-ripple")
-    const areVisible = loaders[0].style.display === "inline-block"
-    loaders[0].style.display = areVisible ? 'none' : "inline-block"
-    loaders[1].style.display = areVisible ? 'none' : "inline-block"
+function toggleLoader() {
+    const div = document.getElementById('rightSide')
+    clearChildElements(div)
+    const loader = document.createElement('div')
+    loader.className = 'lds-ripple'
+    const loaderChildren = [document.createElement('div'), document.createElement('div')]
+    loaderChildren.map(child => loader.appendChild(child))
+    div.appendChild(loader)
+}
+
+function createParagraphs(data, element) {
+    data.map(item => {
+        const par = document.createElement('p')
+        par.innerHTML = `${item[0]}: ${item[1]}`
+        element.appendChild(par)
+    })
 }
 
 function visualizeSolution(solution) {
+    const div =  document.getElementById('rightSide')
+    clearChildElements(div)
     const parsed = JSON.parse(solution)
-    const checks = parsed.checks
-    const koof = parsed.koof
-    const cache_len = parsed.cache_len
-    const queue_len = parsed.queue_len
-    const spend_time = parsed.spend_time
+    const data = [
+        ['Coefficient         ', parsed.koof],
+        ['Checks              ', parsed.checks],
+        ['Cache length        ', parsed.cache_len],
+        ['Queue length        ', parsed.queue_len],
+        ['Time to get solution', parsed.spend_time],
+        ['Moves               ', parsed.moves.length]]
+    createParagraphs(data, div)
 }
 
 const listenerSolve = async function () {
     if (!state.disableButtons && state.currentCombination.join('') !== state.solution.join('')) {
-        toggleLoaders()
+        toggleLoader()
         const solution = await getSolution(state.currentCombination)
         visualizeSolution(solution)
-        toggleLoaders()
         state.disableButtons = true
         const moves = JSON.parse(solution).moves
         const distance = 500 / state.currentFieldSize
@@ -172,10 +191,29 @@ const listenerSolve = async function () {
     }
 }
 
+
+function listenerStop() {
+    for (let timer of state.currentTimers)
+        clearInterval(timer)
+    for (let timer of state.currentRenderTimers)
+        clearInterval(timer)
+    state.disableButtons = false
+}
+
 const listenerSize = function (size) {
     if (!state.disableButtons) {
+        clearChildElements(document.getElementById('rightSide'))
         state.currentFieldSize = size
         refreshField()
+    }
+}
+
+function listenerSpeed(speed) {
+    if (!state.disableButtons) {
+        for (let i = 1; i < 4; i++)
+            document.getElementById(`speed${i}`).style.backgroundColor = '#742f06'
+        state.animationSpeed = speed === 1 ? 1000 : speed === 2 ? 400 : 100
+        document.getElementById(`speed${speed}`).style.backgroundColor = '#3a0000'
     }
 }
 
@@ -190,7 +228,7 @@ const getNewPuzzle = async (size) => {
 
 
 function epilepticMode() {
-    const checkBoxDot = document.getElementById("checkBoxDot")
+    const checkBoxDot = document.getElementById('checkBoxDot')
     if (state.isEpilepticModeEnabled) {
         checkBoxDot.style.left = '0px'
         checkBoxDot.style.right = '28px'
@@ -205,15 +243,17 @@ function epilepticMode() {
 }
 
 window.onload = function () {
-    const buttonNewCombination = document.getElementById('btnNew')
     const buttonSolve = document.getElementById('btnSolve')
-    const checkBox = document.getElementById("checkBox")
+    const buttonStop = document.getElementById('btnStop')
+    const checkBox = document.getElementById('checkBox')
 
     buttonSolve.addEventListener('click', listenerSolve)
-    buttonNewCombination.addEventListener('click', refreshField)
+    buttonStop.addEventListener('click', listenerStop)
     checkBox.addEventListener('click', epilepticMode)
     for (let i = 3; i < 6; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
         document.getElementById(`${i}x${i}`).addEventListener('click', () => {listenerSize(i)})
+    for (let i = 1; i < 4; i++)
+        document.getElementById(`speed${i}`).addEventListener('click', () => {listenerSpeed(i)})
     refreshField()
 }
 
