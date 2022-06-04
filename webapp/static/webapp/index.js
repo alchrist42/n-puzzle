@@ -8,7 +8,9 @@ const state = {
     disableButtons: false,
     solution: []
 }
-let bounceEaseOut = makeEaseOut(quad) /***bounce***/
+let bounceEaseOut = makeEaseOut(quad)
+
+/***bounce***/
 
 function createItem(width, num) {
     const div = document.createElement('div')
@@ -16,8 +18,8 @@ function createItem(width, num) {
         div.className = 'item'
         div.innerHTML += num
         if (state.isEpilepticModeEnabled) {
-            div.style.backgroundColor = `#${Math.floor(Math.random()*1670)}`
-            document.getElementById('checkBoxDot').style.backgroundColor = `#${Math.floor(Math.random()*1675)}`
+            div.style.backgroundColor = `#${Math.floor(Math.random() * 1670)}`
+            document.getElementById('checkBoxDot').style.backgroundColor = `#${Math.floor(Math.random() * 1675)}`
         }
     }
     div.style.width = `${width}%`
@@ -35,6 +37,28 @@ function clearChildElements(element) {
     }
 }
 
+function moveElement(id) {
+    const arr = state.currentCombination
+    const distance = 500 / state.currentFieldSize
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].find(ind => ind === id) > 0) {
+            const x = parseInt(arr[i].findIndex(ind => ind === id))
+            console.log(state.currentFieldSize)
+            if (x < state.currentFieldSize - 1 && arr[i][x + 1] === 0)
+                move(id, distance, 'left', [i, x], [i, x + 1])
+            else if (x > 0 && arr[i][x - 1] === 0)
+                move(id, distance, 'right', [i, x], [i, x - 1])
+            else if (i < state.currentFieldSize - 1 && arr[i + 1][x] === 0)
+                move(id, distance, 'top', [i, x], [i + 1, x])
+            else if (i > 0 && arr[i - 1][x] === 0)
+                move(id, distance, 'botoom', [i, x], [i - 1, x])
+            console.log(state.currentCombination.join(''), state.solution.join(''))
+            if (state.currentCombination.join('') === state.solution.join(''))
+                console.log('solved')
+        }
+    }
+}
+
 function renderField() {
     const field = document.getElementById('field')
     clearChildElements(field)
@@ -43,12 +67,13 @@ function renderField() {
     state.currentCombination.map(item => item.map(it => arr.push(it)))
     for (let it of arr) {
         const item = createItem(itemSize, it)
+        item.addEventListener('click', () => moveElement(it))
         field.appendChild(item)
     }
     return field
 }
 
-function refreshField () {
+function refreshField() {
     if (!state.disableButtons) {
         for (let timer of state.currentTimers)
             clearInterval(timer)
@@ -115,7 +140,7 @@ const getSolution = async (currentCombination) => {
         redirect: 'follow'
     }
     const res = await fetch('http://127.0.0.1:8000/solver/', requestOptions)
-    return res.text()
+    return res
 }
 
 function getDirection(current, destination) {
@@ -157,37 +182,42 @@ function createParagraphs(data, element) {
     })
 }
 
-function visualizeSolution(solution) {
-    const div =  document.getElementById('rightSide')
+async function visualizeSolution(solution) {
+    const div = document.getElementById('rightSide')
     clearChildElements(div)
-    const parsed = JSON.parse(solution)
-    const data = [
-        ['Coefficient         ', parsed.koof],
-        ['Checks              ', parsed.checks],
-        ['Cache length        ', parsed.cache_len],
-        ['Queue length        ', parsed.queue_len],
-        ['Time to get solution', parsed.spend_time],
-        ['Moves               ', parsed.moves.length]]
-    createParagraphs(data, div)
+        const parsed = JSON.parse(solution)
+        const data = [
+            ['Coefficient         ', parsed.koof],
+            ['Checks              ', parsed.checks],
+            ['Cache length        ', parsed.cache_len],
+            ['Queue length        ', parsed.queue_len],
+            ['Time to get solution', parsed.spend_time],
+            ['Moves               ', parsed.moves?.length]]
+        createParagraphs(data, div)
 }
 
 const listenerSolve = async function () {
     if (!state.disableButtons && state.currentCombination.join('') !== state.solution.join('')) {
         toggleLoader()
         const solution = await getSolution(state.currentCombination)
-        visualizeSolution(solution)
-        state.disableButtons = true
-        const moves = JSON.parse(solution).moves
-        const distance = 500 / state.currentFieldSize
-        for (let i = 0; i < moves.length; i++) {
-            const id = moves[i][0]
-            const current = moves[i][1]
-            const destination = moves[i][2]
-            const direction = getDirection(current, destination)
-            state.currentTimers[i] = setTimeout(() => {
-                move(id, distance, direction, current, destination, i)
-            }, i * state.animationSpeed)
+        const text = await solution.text()
+        console.log(solution.error)
+        if (solution.status === 200) {
+            visualizeSolution(text)
+            state.disableButtons = true
+            const moves = JSON.parse(text).moves
+            const distance = 500 / state.currentFieldSize
+            for (let i = 0; i < moves.length; i++) {
+                const id = moves[i][0]
+                const current = moves[i][1]
+                const destination = moves[i][2]
+                const direction = getDirection(current, destination)
+                state.currentTimers[i] = setTimeout(() => {
+                    move(id, distance, direction, current, destination, i)
+                }, i * state.animationSpeed)
+            }
         }
+
     }
 }
 
@@ -251,9 +281,13 @@ window.onload = function () {
     buttonStop.addEventListener('click', listenerStop)
     checkBox.addEventListener('click', epilepticMode)
     for (let i = 3; i < 6; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
-        document.getElementById(`${i}x${i}`).addEventListener('click', () => {listenerSize(i)})
+        document.getElementById(`${i}x${i}`).addEventListener('click', () => {
+            listenerSize(i)
+        })
     for (let i = 1; i < 4; i++)
-        document.getElementById(`speed${i}`).addEventListener('click', () => {listenerSpeed(i)})
+        document.getElementById(`speed${i}`).addEventListener('click', () => {
+            listenerSpeed(i)
+        })
     refreshField()
 }
 
