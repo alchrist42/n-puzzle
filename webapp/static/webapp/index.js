@@ -201,7 +201,7 @@ const listenerSolve = async function () {
         toggleLoader()
         const solution = await getSolution(state.currentCombination)
         const text = await solution.text()
-        console.log(solution.error)
+        console.log(solution['error'])
         if (solution.status === 200) {
             visualizeSolution(text)
             state.disableButtons = true
