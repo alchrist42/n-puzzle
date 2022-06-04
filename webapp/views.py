@@ -9,10 +9,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .logic.generator import make_puzzle, make_goal
 from .logic.solvers import Chebyshev, Euclidean
-from .logic.checker import check_pazzle
+from .logic.checker import check_puzzle
 
 
-def new_pazzle(request, size):
+def new_puzzle(request, size):
     if size < 3 or size > 6:
         return JsonResponse(
             {"error": "incorrect puzzle size, must be in [3,6]"},
@@ -21,7 +21,7 @@ def new_pazzle(request, size):
     pzl = make_puzzle(size, solvable=True, sharp=2)
     goal = make_goal(size, sharp=2)
     return JsonResponse(
-        {"pazzle": pzl, "goal": goal},
+        {"puzzle": pzl, "goal": goal},
         json_dumps_params={"indent":2}
     )
 
@@ -30,15 +30,15 @@ def new_pazzle(request, size):
 @csrf_exempt
 def solver(request):
     body = json.loads(request.body)
-    pzl = body.get("pazzle")
+    pzl = body.get("puzzle")
     if not pzl:
         return JsonResponse(
-            {"error": "no pazzle"},
+            {"error": "no puzzle"},
             status=400
         )
-    if not check_pazzle(pzl):
+    if not check_puzzle(pzl):
         return JsonResponse(
-            {"error": "Not any solution for pazzle"},
+            {"error": "Not any solution for puzzle"},
             status=400
         )
     # todo add not solvable check
@@ -47,7 +47,7 @@ def solver(request):
         opt = 2
     else:
         opt = 4
-    sol = Chebyshev(pzl, optimizator=opt)
+    sol = Euclidean(pzl, optimizator=opt)
     sol.run()
     moves = sol.moves
     return JsonResponse(

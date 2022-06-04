@@ -1,5 +1,5 @@
 import sys
-from .utils import make_goal_map, conver_to_dct, get_zero_pos
+from utils import make_goal_map, conver_to_dct, get_zero_pos
 
 
 def check_puzzle(pzl):
@@ -7,7 +7,7 @@ def check_puzzle(pzl):
     digits = sum(pzl, [])
     # проверяем что вообще пазл содержит правильные числа
     if len(digits) != s**2 or sorted(digits) != list(range(s**2)):
-        return False
+        return None
     hlp = make_goal_map(s)
     dhlp = conver_to_dct(hlp)
 
@@ -23,18 +23,19 @@ def check_puzzle(pzl):
         for y in digits[i + 1 :]:
             pairs += x and y and x > y
 
-    return pairs % 2 == 0
-
     # затем хитровыебанным способом считаем 'ряд' для пустой клетки
-    # два часа времени убито на эти 3 строки, а они похоже лишние
-    if s % 2:
-        zero_row = 0
-    else:
-        zero = get_zero_pos(pzl)
-        zero_row = zero.row + zero.col - dhlp[0].row - dhlp[0].col
+    # два часа времени убито на эти две строки
+    # zero = get_zero_pos(pzl)
+    # if s % 2:
+    #     zero_row =0
+    # else:
+    #     zero_row =0
+    #     pass
+        # zero_row = zero.row + zero.col - dhlp[0].row - dhlp[0].col
+        # zero_row = (s ** 2 - 1 - digits.index(0)) % 2
 
     # пазл имеет решение если кол-во пар + ряд пустой клетки четны
-    return (pairs + zero_row) % 2 == 0
+    return pairs % 2 == 0
 
 
 if __name__ == "__main__":
@@ -42,6 +43,6 @@ if __name__ == "__main__":
 
     lines = sys.stdin.readlines()
     solv = "is solvable" in lines[0]
-    print(solv)
     pzl = [list(map(int, line.split())) for line in lines[2:]]
+    print(solv, check_puzzle(pzl))
     assert check_puzzle(pzl) == solv

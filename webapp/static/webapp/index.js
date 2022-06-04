@@ -80,7 +80,7 @@ function refreshField() {
         for (let timer of state.currentRenderTimers)
             clearInterval(timer)
         getNewPuzzle(state.currentFieldSize).then(r => {
-            state.currentCombination = JSON.parse(r).pazzle
+            state.currentCombination = JSON.parse(r).puzzle
             state.solution = JSON.parse(r).goal
             renderField(state.currentCombination)
         })
@@ -132,7 +132,7 @@ const getSolution = async (currentCombination) => {
     const myHeaders = new Headers()
     myHeaders.append('Content-Type', 'application/json')
     myHeaders.append('Access-Control-Allow-Origin', 'http://127.0.0.1:8000')
-    const raw = JSON.stringify({'pazzle': currentCombination})
+    const raw = JSON.stringify({'puzzle': currentCombination})
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
@@ -252,7 +252,7 @@ const getNewPuzzle = async (size) => {
         method: 'GET',
         redirect: 'follow'
     }
-    const res = await fetch(`http://127.0.0.1:8000/new_pazzle/${size}`, requestOptions)
+    const res = await fetch(`http://127.0.0.1:8000/new_puzzle/${size}`, requestOptions)
     return res.text()
 }
 
