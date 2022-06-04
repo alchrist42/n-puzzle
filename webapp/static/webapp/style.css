@@ -134,6 +134,11 @@ p {
     text-shadow: 1px 1px 2px #030000, 0 0 1em #818181, 0 0 0.2em #9b9b9b;
 }
 
+.congratsGif {
+    width: 150px;
+    height: 100px;
+}
+
 #leftSide, #rightSide {
     width: 200px;
     display: flex;

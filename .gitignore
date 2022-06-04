@@ -134,3 +134,4 @@ dmypy.json
 pzl*.txt
 
 .idea/
+.DS_Store
