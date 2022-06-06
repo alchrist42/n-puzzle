@@ -75,4 +75,9 @@ def conver_to_dct(pzl):
 
 
 def str_pzl(pzl):
-    return "".join(map(str, sum(pzl, [])))
+    return tuple(sum(pzl, []))
+    s = ""
+    for line in pzl:
+        for x in line:
+            s += str(x)
+    return s

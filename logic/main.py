@@ -12,18 +12,24 @@ def main():
     # lines = sys.stdin.readlines()
     # pzl = [list(map(int, line.split())) for line in lines[2:]]
 
-    pzl = PZL4_MOD
+    pzl = PZL6
+    i = 1
+    # Euclidean(pzl, optimizator=i).run()
+    Manhattan(pzl, optimizator=i).run()
+    # Chebyshev(pzl, optimizator=i).run()
 
-    for puzzle in [ PZL3, PZL3_START, PZL3_MOD, PZL4, PZL4_MEDIUM, \
-                    PZL4_MOD, PZL5, PZL5_HARD, PZL5_MEDIUM, PZL6]:
-        print(".", end="")
-        assert check_puzzle(puzzle) == True
+    # for puzzle in [ PZL3, PZL3_START, PZL3_MOD, PZL4, PZL4_MEDIUM, \
+    #                 PZL4_MOD, PZL5, PZL5_HARD, PZL5_MEDIUM, PZL6]:
+    #     print(".", end="")
+    #     assert check_puzzle(puzzle) == True
 
     # print("Solvable" if check_puzzle(pzl) else "NOT Solvable")
-    # for i in range(1):
-    #     Manhattan(pzl, optimizator=i).run()
-    #     Chebyshev(pzl, optimizator=i).run()
-    #     Euclidean(pzl, optimizator=i).run()
+    # for name, pzl in enumerate([PZL3_START, PZL4, PZL4_MEDIUM, PZL5]):
+    #     print("solv N", name)
+    #     for i in range(0, 8, 2):
+    #         Manhattan(pzl, optimizator=i).run()
+    #         Chebyshev(pzl, optimizator=i).run()
+    #         Euclidean(pzl, optimizator=i).run()
 
 
 if __name__ == "__main__":

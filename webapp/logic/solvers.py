@@ -1,8 +1,17 @@
 from time import time
-from copy import deepcopy, copy
-from bisect import insort_left
+from queue import PriorityQueue
+from dataclasses import dataclass, field
 
-from .utils import Pos, make_goal_map, get_zero_pos, conver_to_dct, str_pzl
+from .utils import Pos, make_goal_map, get_zero_pos, conver_to_dct
+
+
+@dataclass(order=True)
+class PriItem:
+    priority: float
+    dist: field(compare=False)
+    zero: field(compare=False)
+    pzl: field(compare=False)
+    moves: field(compare=False)
 
 
 class Solver:
@@ -10,7 +19,7 @@ class Solver:
         self.name = None
         self.pzl = pzl
         self.s = len(pzl)
-        self.optimizator=optimizator
+        self.optimizator = optimizator
         self.max_steps = 0
         self.len_cache = 0
         self.iteration = 0
@@ -20,20 +29,20 @@ class Solver:
         pass
 
     def run(self):
-        z = get_zero_pos(self.pzl)
+        zero = get_zero_pos(self.pzl)
         helper = make_goal_map(self.s)
         dhlp = conver_to_dct(helper)
         dpzl = conver_to_dct(self.pzl)
 
-        start_dist = sum(self.evristic(dpzl[x], dhlp[x]) for x in dpzl)
-        cnt = 0
-        passed = {str_pzl(self.pzl)}
-        steps = [(start_dist, cnt, z, self.pzl, [])]
-        k = 1 / max(2, 8 - self.optimizator)
-        dsts = set()  # todo для отладки
+        start_dist = sum(self.evristic(dpzl[x], dhlp[x]) for x in dpzl if x)
+        passed = set()
+        queue_steps = PriorityQueue()
+        queue_steps.put(PriItem(start_dist, start_dist, zero, self.pzl, []))
+        k = 1 / max(1, 8 - self.optimizator)
         for iter_count in range(0, 10**20):
-            self.max_steps = max(self.max_steps, len(steps))
-            dist, cnt, z, pzl, moves = steps.pop()
+            self.max_steps = max(self.max_steps, queue_steps.qsize())
+            q: PriItem = queue_steps.get()
+            dist, cnt, z, pzl, moves = q.dist, len(q.moves), q.zero, q.pzl, q.moves
             if abs(dist) < 0.0001:
                 self.moves = moves
                 self.len_cache = len(passed)
@@ -41,57 +50,39 @@ class Solver:
                 self.spend_time = round(time() - self.start_time, 3)
                 self.print_mertics(cnt)
                 return
-            poss = [
-                Pos(z.row - 1, z.col),
-                Pos(z.row + 1, z.col),
-                Pos(z.row, z.col + 1),
-                Pos(z.row, z.col - 1),
-            ]
-            # фильтруем только по допустым ходам, от 2 до 4
-            poss = filter(
-                lambda x: x.row != -1
-                and x.row != self.s
-                and x.col != -1
-                and x.col != self.s,
-                poss,
-            )
+            poss = []
+            if z.row:
+                poss.append(Pos(z.row - 1, z.col))
+            if z.row + 1 != self.s:
+                poss.append(Pos(z.row + 1, z.col))
+            if z.col:
+                poss.append(Pos(z.row, z.col - 1))
+            if z.col + 1 != self.s:
+                poss.append(Pos(z.row, z.col + 1))
+
+            # проверяем евристики для каждого возможного хода
             for pos in poss:
                 val = pzl[pos.row][pos.col]
-                new_pzl = deepcopy(pzl)
-                dist_val = self.evristic(pos, dhlp[val]) - self.evristic(z, dhlp[val])
-                dist_zero = self.evristic(z, dhlp[0]) - self.evristic(pos, dhlp[0])
+                new_pzl = [line[:] for line in pzl]
+                # dist_val = self.evristic(pos, dhlp[val]) - self.evristic(z, dhlp[val])
                 # новое 'расстояние' между целевым и текущим полем
-                new_dist = dist - (dist_val + dist_zero)
+                new_dist = dist - (
+                    self.evristic(pos, dhlp[val]) - self.evristic(z, dhlp[val])
+                )
                 new_pzl[z.row][z.col] = val
                 new_pzl[pos.row][pos.col] = 0
                 # Если такой вариант пазла еще не добавляли в возможные ходы
-                if str_pzl(new_pzl) not in passed:
-                    passed.add(str_pzl(new_pzl))
-                    new_moves = copy(moves)
+                hash_pzl = hash(tuple(sum(new_pzl, [])))
+                if hash_pzl not in passed:
+                    passed.add(hash_pzl)
+                    new_moves = moves[:]
                     new_moves.append((val, pos, z))
-                    # Ход вставляется в отсортированный список. где в конце - ходы с наименьшей дистанцией до цели и наименьшим кол-вом движений от начала игры
-                    if self.optimizator:
-                        insort_left(
-                            steps,
-                            (new_dist, cnt + 1, pos, new_pzl, new_moves),
-                            key=lambda x: -(x[0] + x[1] * k),
+                    # Ход вставляется в приоритетную очередь по сумме евристики и кол-ва шагов
+                    queue_steps.put(
+                        PriItem(
+                            new_dist + (cnt + 1) * k, new_dist, pos, new_pzl, new_moves
                         )
-                    else:
-                        insort_left(
-                            steps,
-                            (new_dist, cnt + 1, pos, new_pzl, new_moves),
-                            key=lambda x: -x[0],
-                        )
-
-            # if not iter_count % 100000 and iter_count:
-            #     # print(cnt, -steps[-1][0])
-            #     print(
-            #         f"{cnt} steps\n{iter_count} iteration\n{max_steps} max_steps\n{steps[-1][0]} next_dist"
-            #     )
-
-            # if dist not in dsts:
-            #     dsts.add(dist)
-            #     print("dist to solved: ", dist)
+                    )
 
     def print_mertics(self, cnt):
         print("\n\tSolved!")
