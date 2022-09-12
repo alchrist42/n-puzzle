@@ -1,8 +1,5 @@
-from re import I
-import sys
 from solvers import Manhattan, Chebyshev, Euclidean
 from utils import PZL3, PZL4, PZL4_MEDIUM, PZL5, PZL5_HARD, PZL5_MEDIUM, PZL6
-
 
 
 def main():
