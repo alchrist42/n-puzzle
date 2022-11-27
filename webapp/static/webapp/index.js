@@ -301,7 +301,7 @@ window.onload = function () {
     buttonSolve.addEventListener('click', listenerSolve)
     buttonStop.addEventListener('click', listenerStop)
     checkBox.addEventListener('click', epilepticMode)
-    for (let i = 3; i < 6; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
+    for (let i = 3; i < 7; i++) //TODO Если нужна кнопка 6 на 6 включаешь коммент в index.html и тут итерируешься до 7
         document.getElementById(`${i}x${i}`).addEventListener('click', () => {
             listenerSize(i)
         })
