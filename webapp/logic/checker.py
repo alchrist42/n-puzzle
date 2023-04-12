@@ -1,5 +1,5 @@
 import sys
-from .utils import make_goal_map, conver_to_dct, get_zero_pos
+from webapp.logic.utils import make_goal_map, conver_to_dct, get_zero_pos
 
 
 def check_puzzle(pzl):

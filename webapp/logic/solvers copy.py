@@ -3,7 +3,6 @@ from queue import PriorityQueue
 from dataclasses import dataclass, field
 
 from webapp.logic.utils import Pos, make_goal_map, get_zero_pos, conver_to_dct
-from webapp.logic.checker import check_puzzle
 
 
 @dataclass(order=True)
@@ -25,15 +24,11 @@ class Solver:
         self.len_cache = 0
         self.iteration = 0
         self.start_time = time()
-        self.plz_is_solvable = check_puzzle(pzl)
 
-    def heuristic(a: Pos, b: Pos):
+    def evristic(a: Pos, b: Pos):
         pass
 
     def run(self):
-        if not self.plz_is_solvable:
-            print("Puzzle not solvable")
-            return 
         zero_pos = get_zero_pos(self.pzl)
         goal_map = make_goal_map(self.s)
         pzl_dict = conver_to_dct(self.pzl)
@@ -94,7 +89,7 @@ class Solver:
                         )
                     )
 
-    def print_metrics(self, cnt):
+    def print_mertics(self, cnt):
         print("\n\tSolved!")
         print("Evristic name".ljust(20), self.name)
         print("Optimizator koof".ljust(20), self.optimizator)
@@ -116,7 +111,7 @@ class Manhattan(Solver):
         super().__init__(*args, **kvargs)
         self.name = "Manhattan distance"
 
-    def heuristic(self, a: Pos, b: Pos):
+    def evristic(self, a: Pos, b: Pos):
         return abs(a.col - b.col) + abs(a.row - b.row)
 
 
@@ -125,7 +120,7 @@ class Chebyshev(Solver):
         super().__init__(*args, **kvargs)
         self.name = "Chebyshev distance"
 
-    def heuristic(self, a: Pos, b: Pos):
+    def evristic(self, a: Pos, b: Pos):
         return max(abs(a.col - b.col), abs(a.row - b.row))
 
 
@@ -134,5 +129,5 @@ class Euclidean(Solver):
         super().__init__(*args, **kvargs)
         self.name = "Euclidean distance"
 
-    def heuristic(self, a: Pos, b: Pos):
+    def evristic(self, a: Pos, b: Pos):
         return ((a.col - b.col) ** 2 + (a.row - b.row) ** 2) ** 0.5

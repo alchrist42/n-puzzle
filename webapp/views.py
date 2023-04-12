@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .logic.generator import make_puzzle, make_goal
 from .logic.solvers import Chebyshev, Euclidean
-from .logic.checker import check_puzzle
+# from .logic.checker import check_puzzle
 
 
 def new_puzzle(request, size):
@@ -36,20 +36,22 @@ def solver(request):
             {"error": "no puzzle"},
             status=400
         )
-    if not check_puzzle(pzl):
+    
+    # todo add not solvable check
+    goal = make_goal(len(pzl), sharp=2)
+    if len(pzl) == 3:
+        opt = 7
+    elif len(pzl) == 4:
+        opt = 4
+    else:
+        opt = 2
+    sol = Euclidean(pzl, optimizator=opt)
+    sol.run()
+    if not sol.plz_is_solvable:
         return JsonResponse(
             {"error": "Not any solution for puzzle"},
             status=400
         )
-    # todo add not solvable check
-    goal = make_goal(len(pzl), sharp=2)
-    if len(pzl) == 5:
-        opt = 2
-    else:
-        opt = 4
-    sol = Euclidean(pzl, optimizator=opt)
-    sol.run()
-    moves = sol.moves
     return JsonResponse(
         {
             "evristic_name": sol.name,
