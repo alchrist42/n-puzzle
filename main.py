@@ -24,7 +24,7 @@ def main():
         k_heuristic = 1
         pzl = PZL4_EASY
 
-    Manhattan(pzl, k_heuristic=k_heuristic).run()
+    Manhattan(pzl, print_moves=True, k_heuristic=k_heuristic).run()
     Euclidean(pzl, k_heuristic=k_heuristic).run()
     Chebyshev(pzl, k_heuristic=k_heuristic).run()
 

@@ -16,7 +16,7 @@ class PriItem:
 
 
 class Solver:
-    def __init__(self, pzl, k_heuristic=1):
+    def __init__(self, pzl, print_moves=False, k_heuristic=1):
         self.name = None
         self.pzl = pzl
         self.s = len(pzl)
@@ -24,6 +24,7 @@ class Solver:
         self.max_steps = 0
         self.len_cache = 0
         self.iteration = 0
+        self.print_moves = print_moves
         self.start_time = time()
 
     def heuristic(a: Pos, b: Pos):
@@ -114,6 +115,8 @@ class Solver:
         print("Cache lenght".ljust(20), self.len_cache)
         print("Max lenght queue".ljust(20), self.max_steps)
         print("Spended time".ljust(20), self.spend_time)
+        if self.print_moves:
+            print("Moves\n".ljust(20), [f"{val} ({mov.row},{mov.col})->({zero.row},{zero.col})" for val, mov, zero in self.moves])
 
     @classmethod
     def print_pzl(pzl):
