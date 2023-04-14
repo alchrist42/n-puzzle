@@ -1,0 +1,16 @@
+button {
+    width: 80px;
+    height: 40px;
+    background: #742f06;
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    border-radius: 5px;
+    margin: 15px;
+    padding: 7px;
+}
+
+.buttonsContainer {
+    display: flex;
+}

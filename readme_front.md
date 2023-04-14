@@ -77,3 +77,6 @@ urlpatterns = [
 ...
 ```
 Теперь можно использовать `npm run watch` но перед коммитом лучше все же писать `npm run build`
+
+npm install eslint  
+npm install prettier

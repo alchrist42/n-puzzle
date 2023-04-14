@@ -1,0 +1,28 @@
+.cell {
+    position: absolute;
+    background-size: 100%;
+    border: 4px inset #a68e50;
+    border-radius: 10px;
+    background-repeat: no-repeat;
+    font-size: 2rem;
+    color: #e6c675;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    transition-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+
+.board {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(15deg, #d0b56e 0%, #ffda7b 100%);
+    border: 10px groove #463327;
+    border-radius: 10px;
+}
+
+.empty {
+    border: none;
+}
