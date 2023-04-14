@@ -8,7 +8,7 @@ from django.http import JsonResponse
 
 from django.views.decorators.http import require_POST
 from .logic.generator import make_puzzle, make_goal
-from .logic.solvers import Chebyshev, Euclidean
+from .logic.solvers import Chebyshev, Euclidean, Manhattan
 # from .logic.checker import check_puzzle
 
 
@@ -40,12 +40,12 @@ def solver(request):
     # todo add not solvable check
     goal = make_goal(len(pzl), sharp=2)
     if len(pzl) == 3:
-        opt = 7
+        opt = 1
     elif len(pzl) == 4:
-        opt = 4
+        opt = 1.5
     else:
-        opt = 2
-    sol = Euclidean(pzl, optimizator=opt)
+        opt = 1.7
+    sol = Manhattan(pzl, optimizator=opt)
     sol.run()
     if not sol.plz_is_solvable:
         return JsonResponse(
