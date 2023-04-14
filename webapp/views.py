@@ -17,12 +17,12 @@ def index(request):
     return render(request, "index.html")
 
 
-def new_puzzle(request, size):
+def new_puzzle(request, size, iter=10000):
     if size < 3 or size > 6:
         return JsonResponse(
             {"error": "incorrect puzzle size, must be in [3,6]"}, status=404
         )
-    pzl = make_puzzle(size, solvable=True, sharp=2)
+    pzl = make_puzzle(size, solvable=True, iterations=iter, sharp=2)
     goal = make_goal(size, sharp=2)
     return JsonResponse({"puzzle": pzl, "goal": goal}, json_dumps_params={"indent": 2})
 

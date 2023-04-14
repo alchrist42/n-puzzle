@@ -1,10 +1,14 @@
 export default async function getPuzzle(size) {
-    const res = await fetch(`http://127.0.0.1:8000/new_puzzle/${size}`)
+    const res = await fetch(`new_puzzle/${size}/1`)
     const text = await res.text()
     console.log(text)
-    const parsed = JSON.parse(text).puzzle
+    const parsed = JSON.parse(text)
     const puzzle = []
-    parsed.map(it => puzzle.push(...it))
+    parsed.puzzle.map(it => puzzle.push(...it))
+    const goal_puzzle = []
+    parsed.goal.map(it => goal_puzzle.push(...it))
 
-    return puzzle
+
+    return {"puzzle": puzzle, "goal": goal_puzzle}
 }
+

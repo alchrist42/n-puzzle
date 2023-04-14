@@ -4,12 +4,16 @@ import getPuzzle from "./api/getPuzzle";
 
 const Puzzle = () => {
     const [puzzle, setPuzzle] = useState([]);
+    const [goal, setGoal] = useState([]);
     const [moves, setMoves] = useState(0);
     const [fieldSize, setFieldSize] = useState(3)
 
     // Заполнение начального поля пятнашек
     useEffect(() => {
-        getPuzzle(fieldSize).then(newPuzzle => setPuzzle(newPuzzle))
+        getPuzzle(fieldSize).then(newPuzzle => {
+            setPuzzle(newPuzzle.puzzle);
+            setGoal(newPuzzle.goal);
+        })
     }, [fieldSize]);
 
     // Обработчик клика по ячейке
@@ -20,8 +24,16 @@ const Puzzle = () => {
             [newPuzzle[index], newPuzzle[emptyIndex]] = [newPuzzle[emptyIndex], newPuzzle[index]];
             setPuzzle(newPuzzle);
             setMoves(moves + 1);
+            if (checkGoal(newPuzzle)) {
+                // TODO: add draw gif
+                console.log('you are the winner, the oleg')
+            }
         }
     };
+
+    const checkGoal = (newPuzzle) => {
+        return (newPuzzle.toString() ===  goal.toString())
+    }
 
     // Проверка возможности хода
     const isMoveValid = (index, emptyIndex) => {
