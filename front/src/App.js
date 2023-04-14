@@ -1,31 +1,68 @@
-import React, {useEffect, useState} from 'react';
-import {render} from "react-dom";
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import './Puzzle.css';
+import getPuzzle from "./api/getPuzzle";
 
-function App() {
-  const [puzzle, setPuzzle] = useState([])
+const Puzzle = () => {
+    const [puzzle, setPuzzle] = useState([]);
+    const [moves, setMoves] = useState(0);
+    const [fieldSize, setFieldSize] = useState(3)
 
-  async function getPuzzle() {
-      const res = await fetch("new_puzzle/3")
-      const text = await res.text()
-      setPuzzle(JSON.parse(text).puzzle)
-      // setPuzzle()
-      console.log(JSON.parse(text).puzzle)
-  }
+    // Заполнение начального поля пятнашек
+    useEffect(() => {
+        getPuzzle(fieldSize).then(newPuzzle => setPuzzle(newPuzzle))
+    }, [fieldSize]);
 
-  useEffect(() => {
-      getPuzzle()
-  }, [])
+    // Обработчик клика по ячейке
+    const handleClick = (index) => {
+        const newPuzzle = [...puzzle];
+        const emptyIndex = newPuzzle.indexOf(0);
+        if (isMoveValid(index, emptyIndex)) {
+            [newPuzzle[index], newPuzzle[emptyIndex]] = [newPuzzle[emptyIndex], newPuzzle[index]];
+            setPuzzle(newPuzzle);
+            setMoves(moves + 1);
+        }
+    };
 
-  // useEffect(() => {
-  //     if(puzzle.length)
-  //         alert(puzzle)
-  // }, [puzzle])
+    // Проверка возможности хода
+    const isMoveValid = (index, emptyIndex) => {
+        return (
+            (index === emptyIndex - fieldSize || index === emptyIndex + fieldSize ||
+                (index === emptyIndex - 1 && index % fieldSize !== 0) ||
+                (index === emptyIndex + 1 && emptyIndex % fieldSize !== 0)) &&
+            puzzle[index] !== 0 &&
+            Math.abs(index - emptyIndex) === fieldSize || Math.abs(index - emptyIndex) === 1
+        );
+    };
 
-  return (
-      <div>dfsdfsd{puzzle}</div>
-  );
-}
+    // Генерация ячеек поля
+    const renderCell = (index) => {
+        const percent = 100 / fieldSize
+        const value = puzzle[index];
+        const left = (index % fieldSize) * percent + '%';
+        const top = Math.floor(index / fieldSize) * percent + '%';
+        const backgroundColor = value !== 0 ? 'red': '';
+        const className = `cell ${value === 0 ? 'empty' : ''}`;
 
-export default App;
+        const width = `${300 / fieldSize}px`;
+        const height = `${300 / fieldSize}px`;
+        return (
+            <div className={className} style={{ left, top, backgroundColor, width, height }} onClick={() => handleClick(index)}>
+                {value !== 0 ? value : ''}
+            </div>
+        );
+    };
+
+    return (
+        <div className="puzzle">
+            <button onClick={() => setFieldSize(3)}>3x3</button>
+            <button onClick={() => setFieldSize(4)}>4x4</button>
+            <button onClick={() => setFieldSize(5)}>5x5</button>
+            <div className="board">
+                {[...Array(fieldSize * fieldSize).keys()].map((i) => renderCell(i))}
+            </div>
+            <div className="moves">Moves: {moves}</div>
+        </div>
+    );
+};
+
+export default Puzzle;
