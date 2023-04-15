@@ -40,9 +40,9 @@ def solver(request):
     if len(pzl) == 3:
         opt = 1
     elif len(pzl) == 4:
-        opt = 1.5
+        opt = 1.3
     else:
-        opt = 1.7
+        opt = 1.6
     sol = Manhattan(pzl, optimizator=opt)
     sol.run()
     if not sol.plz_is_solvable:
@@ -56,6 +56,7 @@ def solver(request):
             "cache_len": sol.len_cache,
             "queue_len": sol.max_steps,
             "spend_time": sol.spend_time,
+            "start_distance": sol.start_heuristic_dist
         },
         json_dumps_params={"indent": 2},
     )

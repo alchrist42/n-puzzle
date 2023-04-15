@@ -5,6 +5,9 @@ export default function Board ({puzzle, setPuzzle, moves, setMoves, fieldSize, g
 
     // Обработчик клика по ячейке
     const handleClick = (index) => {
+        if (checkGoal(puzzle)) {
+            return;
+        }
         const newPuzzle = [...puzzle];
         const emptyIndex = newPuzzle.indexOf(0);
         if (isMoveValid(index, emptyIndex)) {

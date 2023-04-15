@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import getPuzzle from "./api/getPuzzle";
 import Board from "./components/Board";
 import Buttons from "./components/Buttons"
+
 import './App.css'
 
 const Puzzle = () => {
