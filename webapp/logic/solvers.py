@@ -14,6 +14,13 @@ class PriItem:
     pzl: field(compare=False)
     moves: field(compare=False)
 
+# @dataclass
+# class Solution:
+#     moves: list = []
+#     len_cache: int = 0
+#     iteration: int = 0
+#     spend_time: float = 0
+
 
 class Solver:
     def __init__(self, pzl, print_moves=False, k_heuristic=1):
@@ -25,14 +32,15 @@ class Solver:
         self.len_cache = 0
         self.iteration = 0
         self.print_moves = print_moves
+        self.raise_timeout = False
         self.start_time = time()
 
     def heuristic(a: Pos, b: Pos):
         pass
 
     def run(self):
-        self.plz_is_solvable = check_puzzle(self.pzl)
-        if not self.plz_is_solvable:
+        self.pzl_is_solvable = check_puzzle(self.pzl)
+        if not self.pzl_is_solvable:
             print("Puzzle not solvable")
             return
         zero_pos = get_zero_pos(self.pzl)
@@ -57,15 +65,17 @@ class Solver:
                 item.pzl,
                 item.moves,
             )
-
+            if self.raise_timeout: # hint for future
+                return
             if abs(dist) < 0.0001:
                 assert pzl == goal_map, "incorrect solution"
+                # Solution(moves, len(visited), iter_count, round(time() - self.start_time))
                 self.moves = moves
                 self.len_cache = len(visited)
                 self.iteration = iter_count
                 self.spend_time = round(time() - self.start_time, 3)
                 self.print_metrics(cnt)
-                return
+                return self
 
             possible_moves = []
             if zero.row:
@@ -104,6 +114,7 @@ class Solver:
                             new_moves,
                         )
                     )
+        return self
 
     def print_metrics(self, cnt):
         print("\n\tSolved!")
