@@ -36,7 +36,7 @@ def solver(request):
         return JsonResponse({"error": "no puzzle"}, status=400)
 
     # convert to 2 dimensional
-    if pzl and not isinstance(pzl[0], list | tuple):
+    if pzl and not isinstance(pzl[0], list):
         square = len(pzl)
         if abs(square**0.5 - int(square**0.5)) > 0.01:
             return JsonResponse({"error": "incorrect puzzle lenght"}, status=400)

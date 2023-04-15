@@ -1,26 +1,14 @@
-
 export default async function getSolution(puzzle) {
-    // POST request using fetch with async/await
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ puzzle: puzzle})
-    };
-    const res = await fetch(`solver/`, requestOptions)
-    const sol = await res.json();
-
-    if (res.status === 200) {
-        console.log(sol);
-        return sol;
-    }
-    else {
-        if ("error" in sol) {
-            console.log(sol["error"] + "\n")
-        }
-        console.log("\nCouldn't solve this puzzle\n Can you?")
-        // TODO: should we do anything?
-    }
-    
-    return NaN;
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Access-Control-Allow-Origin", "http://127.0.0.1:8000");
+  const raw = JSON.stringify({ puzzle: puzzle });
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+  const response = await fetch("http://127.0.0.1:8000/solver/", requestOptions);
+  return JSON.parse(await response.text());
 }
-
