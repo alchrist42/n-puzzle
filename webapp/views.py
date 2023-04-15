@@ -41,7 +41,7 @@ def solver(request):
             return JsonResponse({"error": "Incorrect puzzle lenght"}, status=400)
         lenght = int(square**0.5)
         pzl = [pzl[lenght * i : lenght * (i + 1)] for i in range(lenght)]
-        
+
     opt = len(pzl) / 3
     sol = Manhattan(pzl, k_heuristic=opt)
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -59,11 +59,11 @@ def solver(request):
             "evristic_name": sol.name,
             "moves": sol.moves,
             "checks": sol.iteration,
-            "koof": sol.k_heuristic,
+            "k_heuristic": round(sol.k_heuristic, 2),
             "cache_len": sol.len_cache,
             "queue_len": sol.max_steps,
             "spend_time": sol.spend_time,
-            "start_distance": sol.start_heuristic_dist,
+            "start_distance": round(sol.start_heuristic_dist, 2)
         },
         json_dumps_params={"indent": 2},
     )
