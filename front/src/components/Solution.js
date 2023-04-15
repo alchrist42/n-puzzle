@@ -41,7 +41,6 @@ function Solution({ solvePuzzle, stopSolving }) {
     setSolutionDetails(null);
     const solution = await getSolution(puzzle);
     setPendingRequest(false);
-    solution.start_distance = solution.start_distance.toFixed(2);
     solvePuzzle(solution.moves);
     solution.moves = solution.moves.length;
     setSolutionDetails(solution);

@@ -36,6 +36,8 @@ class mainStore {
   }
 
   getPuzzle() {
+    this.setPuzzle([]);
+    this.setSolution(null);
     getPuzzle(this.fieldSize).then((newPuzzle) => {
       this.setPuzzle(newPuzzle.puzzle);
       this.setGoal(newPuzzle.goal);

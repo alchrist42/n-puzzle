@@ -8,8 +8,7 @@ import "./App.css";
 import { observer } from "mobx-react-lite";
 
 const App = () => {
-  const { setSolution, successGif, solved, getPuzzle, moves, setMoves } =
-    mainStore;
+  const { setSolution, successGif, solved, getPuzzle, moves } = mainStore;
 
   // Заполнение начального поля пятнашек
   useEffect(() => {
