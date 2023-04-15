@@ -10,6 +10,7 @@ export default function Board({
   goal,
   solution,
   setSolution,
+  pendingRequest,
 }) {
   const [currentTimeout, setCurrentTimeout] = useState(0);
 
@@ -26,7 +27,7 @@ export default function Board({
 
   // Обработчик клика по ячейке
   const handleClick = (index) => {
-    if (checkGoal(puzzle)) {
+    if (checkGoal(puzzle) || pendingRequest) {
       return;
     }
     const newPuzzle = [...puzzle];
@@ -78,7 +79,9 @@ export default function Board({
       <div
         className={className}
         style={{ left, top, backgroundColor, width, height }}
-        onClick={() => handleClick(index)}
+        onClick={() => {
+          if (!solution) handleClick(index);
+        }}
       >
         {value !== 0 ? value : ""}
       </div>

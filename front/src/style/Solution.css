@@ -1,0 +1,17 @@
+.solutionContainer {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.tableContainer {
+    width: 180px;
+}
+
+.tableBorder {
+    border: 1px solid #1f1b1b;
+    border-collapse: collapse;
+    font-size: small;
+}

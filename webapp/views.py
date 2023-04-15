@@ -46,9 +46,13 @@ def solver(request):
     if len(pzl) == 3:
         opt = 1
     elif len(pzl) == 4:
-        opt = 1.3
+        opt = 1.8
+    elif len(pzl) == 5:
+        opt = 1.9
+    elif len(pzl) == 6:
+        opt = 2.3
     else:
-        opt = 1.6
+        opt = 3
     sol = Manhattan(pzl, k_heuristic=opt)
     sol.run()
     if not sol.plz_is_solvable:
