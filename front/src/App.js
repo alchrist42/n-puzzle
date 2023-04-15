@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Board from "./components/Board";
 import Buttons from "./components/Buttons";
 import Solution from "./components/Solution";
+import SpeedRange from "./components/SpeedRange";
 import mainStore from "./store/mainStore";
 
 import "./App.css";
@@ -41,8 +42,9 @@ const App = () => {
         )}
         <Solution solvePuzzle={solvePuzzle} stopSolving={stopSolving} />
       </div>
-
+      <SpeedRange />
       <div className="moves">Moves: {moves}</div>
+      
     </div>
   );
 };

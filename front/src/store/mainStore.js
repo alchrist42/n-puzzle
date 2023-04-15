@@ -11,6 +11,7 @@ class mainStore {
   pendingRequest = false;
   successGif = null;
   solved = false;
+  speed = 5;
 
   constructor() {
     makeAutoObservable(this, {
@@ -22,6 +23,7 @@ class mainStore {
       pendingRequest: observable,
       successGif: observable,
       solved: observable,
+      speed: observable,
 
       getPuzzle: action.bound,
       setPuzzle: action.bound,
@@ -32,6 +34,7 @@ class mainStore {
       setPendingRequest: action.bound,
       getSuccessGif: action.bound,
       setSolved: action.bound,
+      setSpeed: action.bound,
     });
   }
 
@@ -73,6 +76,10 @@ class mainStore {
 
   setMoves(moves) {
     this.moves = moves;
+  }
+
+  setSpeed(speed) {
+    this.speed = speed;
   }
 
   async getSuccessGif() {
