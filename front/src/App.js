@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import getPuzzle from "./api/getPuzzle";
+import getSolution from "./api/getSolution";
 import Board from "./components/Board";
 import Buttons from "./components/Buttons"
 
@@ -30,7 +31,9 @@ const Puzzle = () => {
                    fieldSize={fieldSize}
                    setMoves={setMoves}
             />
+
             <div className="moves">Moves: {moves}</div>
+            <button onClick={() => getSolution(puzzle)}>tempGetSolution</button>
         </div>
     );
 };

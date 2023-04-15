@@ -22,8 +22,8 @@ def new_puzzle(request, size, iter=10000):
         return JsonResponse(
             {"error": "incorrect puzzle size, must be in [3,6]"}, status=404
         )
-    pzl = make_puzzle(size, solvable=True, iterations=iter, sharp=2)
-    goal = make_goal(size, sharp=2)
+    pzl = make_puzzle(size, solvable=True, iterations=iter, sharp=1)
+    goal = make_goal(size, sharp=1)
     return JsonResponse({"puzzle": pzl, "goal": goal}, json_dumps_params={"indent": 2})
 
 
@@ -35,7 +35,13 @@ def solver(request):
     if not pzl:
         return JsonResponse({"error": "no puzzle"}, status=400)
 
-    # todo add not solvable check
+    # convert to 2 dimensional
+    if pzl and not isinstance(pzl[0], list | tuple):
+        square = len(pzl)
+        if abs(square**0.5 - int(square**0.5)) > 0.01:
+            return JsonResponse({"error": "incorrect puzzle lenght"}, status=400)
+        lenght = int(square**0.5)
+        pzl = [pzl[lenght * i : lenght * (i + 1)] for i in range(lenght)]
     goal = make_goal(len(pzl), sharp=2)
     if len(pzl) == 3:
         opt = 1
@@ -43,7 +49,7 @@ def solver(request):
         opt = 1.3
     else:
         opt = 1.6
-    sol = Manhattan(pzl, optimizator=opt)
+    sol = Manhattan(pzl, k_heuristic=opt)
     sol.run()
     if not sol.plz_is_solvable:
         return JsonResponse({"error": "Not any solution for puzzle"}, status=400)
@@ -56,7 +62,7 @@ def solver(request):
             "cache_len": sol.len_cache,
             "queue_len": sol.max_steps,
             "spend_time": sol.spend_time,
-            "start_distance": sol.start_heuristic_dist
+            "start_distance": sol.start_heuristic_dist,
         },
         json_dumps_params={"indent": 2},
     )
