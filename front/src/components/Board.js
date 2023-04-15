@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import "../style/Board.css";
+import mainStore from "../store/mainStore";
+import { observer } from "mobx-react-lite";
 
-export default function Board({
-  puzzle,
-  setPuzzle,
-  moves,
-  setMoves,
-  fieldSize,
-  goal,
-  solution,
-  setSolution,
-  pendingRequest,
-}) {
+function Board() {
   const [currentTimeout, setCurrentTimeout] = useState(0);
+  const {
+    puzzle,
+    setPuzzle,
+    solution,
+    goal,
+    setSolution,
+    fieldSize,
+    pendingRequest,
+    getSuccessGif,
+    moves,
+    setMoves,
+  } = mainStore;
 
   useEffect(() => {
     if (solution) {
@@ -40,8 +44,7 @@ export default function Board({
       setPuzzle(newPuzzle);
       setMoves(moves + 1);
       if (checkGoal(newPuzzle)) {
-        // TODO: add draw gif
-        console.log("you are the winner, the oleg");
+        getSuccessGif().then();
       }
     }
   };
@@ -94,3 +97,5 @@ export default function Board({
     </div>
   );
 }
+
+export default observer(Board);

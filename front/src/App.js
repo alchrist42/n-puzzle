@@ -1,34 +1,20 @@
 import React, { useState, useEffect } from "react";
-import getPuzzle from "./api/getPuzzle";
 import Board from "./components/Board";
 import Buttons from "./components/Buttons";
 import Solution from "./components/Solution";
+import mainStore from "./store/mainStore";
 
 import "./App.css";
+import { observer } from "mobx-react-lite";
 
-const Puzzle = () => {
-  const [puzzle, setPuzzle] = useState([]);
-  const [goal, setGoal] = useState([]);
-  const [moves, setMoves] = useState(0);
-  const [fieldSize, setFieldSize] = useState(3);
-  const [solution, setSolution] = useState(null);
-  const [pendingRequest, setPendingRequest] = useState(false);
-
-  function resetState() {
-    setPuzzle([]);
-    setGoal([]);
-    setMoves(0);
-    setSolution(null);
-  }
+const App = () => {
+  const { setSolution, successGif, solved, getPuzzle, moves, setMoves } =
+    mainStore;
 
   // Заполнение начального поля пятнашек
   useEffect(() => {
-    resetState();
-    getPuzzle(fieldSize).then((newPuzzle) => {
-      setPuzzle(newPuzzle.puzzle);
-      setGoal(newPuzzle.goal);
-    });
-  }, [fieldSize]);
+    getPuzzle();
+  }, []);
 
   function solvePuzzle(moves) {
     const elementsToMove = [];
@@ -45,27 +31,16 @@ const Puzzle = () => {
   return (
     <div className="mainContainer">
       <div className="container">
-        <Buttons setFieldSize={setFieldSize} pendingRequest={pendingRequest} />
-        <Board
-          puzzle={puzzle}
-          setPuzzle={setPuzzle}
-          goal={goal}
-          moves={moves}
-          fieldSize={fieldSize}
-          setMoves={setMoves}
-          solution={solution}
-          setSolution={setSolution}
-          pendingRequest={pendingRequest}
-        />
-        <Solution
-          puzzle={puzzle}
-          solution={solution}
-          pendingRequest={pendingRequest}
-          setPendingRequest={setPendingRequest}
-          solvePuzzle={solvePuzzle}
-          stopSolving={stopSolving}
-          fieldSize={fieldSize}
-        />
+        <Buttons />
+        {solved ? (
+          <div className={"congratsContainer"}>
+            You are the champion, Oleg
+            <img src={successGif} alt={"You are the champion, Oleg"} />
+          </div>
+        ) : (
+          <Board />
+        )}
+        <Solution solvePuzzle={solvePuzzle} stopSolving={stopSolving} />
       </div>
 
       <div className="moves">Moves: {moves}</div>
@@ -73,4 +48,4 @@ const Puzzle = () => {
   );
 };
 
-export default Puzzle;
+export default observer(App);

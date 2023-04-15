@@ -3,6 +3,8 @@ import "../style/Solution.css";
 import getSolution from "../api/getSolution";
 import { useEffect, useState } from "react";
 import { Grid } from "react-loader-spinner";
+import mainStore from "../store/mainStore";
+import { observer } from "mobx-react-lite";
 
 const SolutionDetailsTable = ({ details }) => {
   return (
@@ -25,16 +27,10 @@ const SolutionDetailsTable = ({ details }) => {
   );
 };
 
-export default function Solution({
-  puzzle,
-  solution,
-  solvePuzzle,
-  stopSolving,
-  pendingRequest,
-  setPendingRequest,
-  fieldSize,
-}) {
+function Solution({ solvePuzzle, stopSolving }) {
   const [solutionDetails, setSolutionDetails] = useState(null);
+  const { puzzle, solution, fieldSize, pendingRequest, setPendingRequest } =
+    mainStore;
 
   useEffect(() => {
     setSolutionDetails(null);
@@ -47,7 +43,7 @@ export default function Solution({
     setPendingRequest(false);
     solution.start_distance = solution.start_distance.toFixed(2);
     solvePuzzle(solution.moves);
-    delete solution.moves;
+    solution.moves = solution.moves.length;
     setSolutionDetails(solution);
   }
 
@@ -73,3 +69,5 @@ export default function Solution({
     </div>
   );
 }
+
+export default observer(Solution);

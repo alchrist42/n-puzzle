@@ -1,6 +1,9 @@
 import "../style/Buttons.css";
+import mainStore from "../store/mainStore";
+import { observer } from "mobx-react-lite";
 
-export default function Buttons({ setFieldSize, pendingRequest }) {
+function Buttons() {
+  const { setFieldSize, pendingRequest } = mainStore;
   const sizes = [3, 4, 5, 6];
   return (
     <div className={"buttonsContainer"}>
@@ -17,3 +20,5 @@ export default function Buttons({ setFieldSize, pendingRequest }) {
     </div>
   );
 }
+
+export default observer(Buttons);
