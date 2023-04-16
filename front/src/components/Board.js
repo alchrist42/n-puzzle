@@ -16,6 +16,7 @@ function Board() {
     getSuccessGif,
     moves,
     setMoves,
+    speed,
   } = mainStore;
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function Board() {
         setTimeout(() => {
           handleClick(puzzle.indexOf(solution[0]));
           setSolution(solution?.length > 1 ? solution.slice(1) : null);
-        }, 500)
+        }, 1000 / speed)
       );
     } else clearTimeout(currentTimeout);
   }, [solution]);
