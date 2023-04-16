@@ -12,6 +12,7 @@ class mainStore {
   successGif = null;
   solved = false;
   speed = 5;
+  epileptic = false;
 
   constructor() {
     makeAutoObservable(this, {
@@ -24,6 +25,7 @@ class mainStore {
       successGif: observable,
       solved: observable,
       speed: observable,
+      epileptic: observable,
 
       getPuzzle: action.bound,
       setPuzzle: action.bound,
@@ -35,6 +37,7 @@ class mainStore {
       getSuccessGif: action.bound,
       setSolved: action.bound,
       setSpeed: action.bound,
+      setEpileptic: action.bound,
     });
   }
 
@@ -80,6 +83,10 @@ class mainStore {
 
   setSpeed(speed) {
     this.speed = speed;
+  }
+
+  setEpileptic(epileptic) {
+    this.epileptic = epileptic;
   }
 
   async getSuccessGif() {

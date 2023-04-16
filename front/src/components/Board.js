@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../style/Board.css";
 import mainStore from "../store/mainStore";
 import { observer } from "mobx-react-lite";
+import { getRandomColor } from "../functions";
 
 function Board() {
   const [currentTimeout, setCurrentTimeout] = useState(0);
@@ -17,6 +18,7 @@ function Board() {
     moves,
     setMoves,
     speed,
+    epileptic,
   } = mainStore;
 
   useEffect(() => {
@@ -73,7 +75,8 @@ function Board() {
     const value = puzzle[index];
     const left = (index % fieldSize) * percent + "%";
     const top = Math.floor(index / fieldSize) * percent + "%";
-    const backgroundColor = value !== 0 ? "#441a02" : "";
+    const backgroundColor =
+      value !== 0 ? (epileptic ? `#${getRandomColor()}` : "#441a02") : "";
     const className = ` ${value === 0 ? "empty" : "cell"}`;
     const size = 400 / fieldSize - 10;
 

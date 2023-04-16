@@ -1,0 +1,29 @@
+.switch {
+    width: 60px;
+    height: 30px;
+    background-color: #dcdcdc;
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch__knob {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #fff;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 3px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.switch--on .switch__knob {
+    transform: translate(28px,-50%);
+}
+
+.switch--off .switch__knob {
+    transform: translate(3px, -50%);
+}
