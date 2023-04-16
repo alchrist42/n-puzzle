@@ -29,18 +29,29 @@ const SolutionDetailsTable = ({ details }) => {
 
 function Solution({ solvePuzzle, stopSolving }) {
   const [solutionDetails, setSolutionDetails] = useState(null);
-  const { puzzle, solution, fieldSize, pendingRequest, setPendingRequest } =
+  const [solutionError, setSolutionError] = useState(null);
+  const { puzzle, solution, goal, pendingRequest, setPendingRequest, solved } =
     mainStore;
 
-  useEffect(() => {
+  function resetState() {
     setSolutionDetails(null);
-  }, [fieldSize]);
+    setSolutionError(null);
+  }
+
+  useEffect(() => {
+    resetState();
+  }, [goal]);
 
   async function requestSolution() {
+    if (solved) return;
     setPendingRequest(true);
-    setSolutionDetails(null);
+    resetState();
     const solution = await getSolution(puzzle);
     setPendingRequest(false);
+    if (solution.error) {
+      setSolutionError(solution.error);
+      return;
+    }
     solvePuzzle(solution.moves);
     solution.moves = solution.moves.length;
     setSolutionDetails(solution);
@@ -49,6 +60,7 @@ function Solution({ solvePuzzle, stopSolving }) {
   return (
     <div className={"solutionContainer"}>
       {solutionDetails && <SolutionDetailsTable details={solutionDetails} />}
+      {solutionError && <div>{solutionError}</div>}
       {solution ? (
         <button onClick={stopSolving}>stop solving</button>
       ) : pendingRequest ? (

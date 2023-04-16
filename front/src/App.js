@@ -34,8 +34,9 @@ const App = () => {
         <Buttons />
         {solved ? (
           <div className={"congratsContainer"}>
-            You are the champion, Oleg
+            <h3>You are the champion, Oleg</h3>
             <img src={successGif} alt={"You are the champion, Oleg"} />
+            <p>You are not Oleg? It's a pity</p>
           </div>
         ) : (
           <Board />
@@ -44,7 +45,6 @@ const App = () => {
       </div>
       <SpeedRange />
       <div className="moves">Moves: {moves}</div>
-      
     </div>
   );
 };
