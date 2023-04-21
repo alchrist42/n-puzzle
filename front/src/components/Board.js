@@ -22,19 +22,52 @@ function Board() {
   } = mainStore;
 
   useEffect(() => {
-    if (solution) {
-      setCurrentTimeout(
-        setTimeout(() => {
-          handleClick(puzzle.indexOf(solution[0]));
-          setSolution(solution?.length > 1 ? solution.slice(1) : null);
-        }, 1000 / speed)
-      );
-    } else clearTimeout(currentTimeout);
+    if (solution) handleClick(puzzle.indexOf(solution[0]));
+    else clearTimeout(currentTimeout);
   }, [solution]);
+
+  function updateState(cell, emptyCell, newPuzzle) {
+    [cell, emptyCell].forEach((el) => {
+      el.style.transition = "";
+      el.style.transform = "";
+    });
+    setPuzzle(newPuzzle);
+    setMoves(moves + 1);
+    if (checkGoal(newPuzzle)) {
+      getSuccessGif().then();
+    }
+  }
+
+  const animateMove = (index, emptyIndex, newPuzzle) => {
+    const percent = 100 / fieldSize - 35;
+    const cell = document.getElementById(`cell-${index}`);
+    const emptyCell = document.getElementById(`cell-${emptyIndex}`);
+    const leftOffset =
+      ((index % fieldSize) - (emptyIndex % fieldSize)) * percent;
+    const topOffset =
+      (Math.floor(index / fieldSize) - Math.floor(emptyIndex / fieldSize)) *
+      percent;
+
+    [cell, emptyCell].forEach((el) => {
+      window.requestAnimationFrame(() => {
+        el.style.transition = `transform ${1000 / speed}ms linear 0s;`;
+        el.style.transform = `translate(${leftOffset}%, ${topOffset}%, 0)`;
+      });
+    });
+
+    setCurrentTimeout(
+      setTimeout(() => {
+        updateState(cell, emptyCell, newPuzzle);
+        if (solution)
+          setSolution(solution?.length > 1 ? solution.slice(1) : null);
+        setCurrentTimeout(0);
+      }, 1000 / speed)
+    );
+  };
 
   // Обработчик клика по ячейке
   const handleClick = (index) => {
-    if (checkGoal(puzzle) || pendingRequest) {
+    if (checkGoal(puzzle) || pendingRequest || currentTimeout) {
       return;
     }
     const newPuzzle = [...puzzle];
@@ -44,11 +77,7 @@ function Board() {
         newPuzzle[emptyIndex],
         newPuzzle[index],
       ];
-      setPuzzle(newPuzzle);
-      setMoves(moves + 1);
-      if (checkGoal(newPuzzle)) {
-        getSuccessGif().then();
-      }
+      animateMove(index, emptyIndex, newPuzzle);
     }
   };
 
@@ -85,6 +114,7 @@ function Board() {
     return (
       <div
         className={className}
+        id={`cell-${index}`}
         style={{ left, top, backgroundColor, width, height }}
         onClick={() => {
           if (!solution) handleClick(index);

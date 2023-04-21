@@ -60,7 +60,7 @@ function Solution({ solvePuzzle, stopSolving }) {
   return (
     <div className={"solutionContainer"}>
       {solutionDetails && <SolutionDetailsTable details={solutionDetails} />}
-      {solutionError && <div>{solutionError}</div>}
+      {solutionError && <div className={"tableContainer"}>{solutionError}</div>}
       {solution ? (
         <button onClick={stopSolving}>stop solving</button>
       ) : pendingRequest ? (
