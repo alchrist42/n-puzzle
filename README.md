@@ -8,7 +8,7 @@ search algorithm or one of its variants. The final board state should be "snail"
 
 
 --- 
-### Instructions
+### Run web version
 #### Create and activate virtual enviroment
 ```sh
 python3 -m venv venv
@@ -25,7 +25,7 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 
-#### Manual testing
+### Manual testing
 ```sh
 # 3 is size field. 1 is heuristic_cooficient. for size 4 and more use [1 .. 3]
 python2.7 webapp/logic/npuzzle-gen.py 3 -s | python main.py 1
